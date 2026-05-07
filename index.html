@@ -267,6 +267,23 @@
   }
   .settings-btn:active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
 
+  /* ── Now Playing Button ── */
+  .now-playing-btn {
+    background: none; border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text-faint); font-size: 15px; height: 34px;
+    display: none; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer; transition: all var(--trans); flex-shrink: 0;
+    padding: 0 10px; white-space: nowrap; font-family: var(--sans);
+  }
+  .now-playing-btn.visible { display: flex; }
+  .now-playing-btn:active { color: var(--green); border-color: var(--green); background: rgba(90,206,160,0.1); }
+  .now-playing-pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  .now-playing-label { font-size: 11px; font-weight: 500; color: var(--green); max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+
   /* ── Settings Modal ── */
   .settings-section { margin-bottom: 20px; }
   .settings-section-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 10px; }
@@ -303,6 +320,7 @@
     <nav class="breadcrumb" id="breadcrumb"></nav>
     <div class="topbar-right" id="topbar-right"></div>
     <button class="settings-btn" onclick="showSettingsModal()" title="Settings">⚙︎</button>
+    <button class="now-playing-btn" id="now-playing-btn" onclick="goToNowPlaying()" title="Now Playing"></button>
   </div>
   <div id="content"></div>
 </div>
@@ -546,7 +564,8 @@ function renderTopbarRight() {
   if (state.view==='home') {
     el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddArtistModal()">+ Artist</button>`;
   } else if (state.view==='artist' && ar) {
-    el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddAlbumModal('${ar.id}')">+ Album</button>`;
+    const spBtn = spotifyIsConnected() ? `<button class="btn btn-ghost btn-sm" onclick="showAddAllAlbumsModal('${ar.id}')" title="Import full discography from Spotify">+ All Albums</button>` : '';
+    el.innerHTML = `${spBtn}<button class="btn btn-primary btn-sm" onclick="showAddAlbumModal('${ar.id}')">+ Album</button>`;
   } else if (state.view==='album' && al && ar) {
     el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddSongModal('${ar.id}','${al.id}')">+ Songs</button>`;
   } else el.innerHTML = '';
@@ -856,7 +875,7 @@ function clearAllData() {
 /* ─── Spotify PKCE ─── */
 const SPOTIFY_CLIENT_ID = 'd1aafa67bfa64379a48b4b4eb7f04079';
 const SPOTIFY_REDIRECT   = 'https://viperx1919.github.io/Music-Rater/';
-const SPOTIFY_SCOPES     = 'user-read-private';
+const SPOTIFY_SCOPES     = 'user-read-private user-read-currently-playing user-read-playback-state';
 
 function spotifyToken() { return localStorage.getItem('sp_token'); }
 function spotifyExpiry() { return parseInt(localStorage.getItem('sp_expiry')||'0'); }
@@ -1037,6 +1056,196 @@ async function spImportAlbum(aid, spotifyAlbumId, albumName, year, artistName) {
   toast(`Imported ${trackNames.length} tracks ✓`);
 }
 
+/* ─── Add All Albums ─── */
+async function spotifyGetArtistAlbums(artistId) {
+  const token = spotifyToken();
+  if (!token) return null;
+  const res = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&limit=50&market=AU`, {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (res.status === 401) { spotifyDisconnect(); return null; }
+  return res.json();
+}
+
+async function showAddAllAlbumsModal(aid) {
+  if (!spotifyIsConnected()) { toast('Connect Spotify in Settings first'); return; }
+  const ar = data.artists.find(a => a.id === aid);
+  if (!ar) return;
+
+  showModal(`
+    <div class="modal-title">Add All Albums</div>
+    <div class="modal-field spotify-search-wrap">
+      <label class="modal-label">Search Artist on Spotify</label>
+      <input class="modal-input" id="sp-all-search" type="text" placeholder="${esc(ar.name)}"
+        oninput="spAllArtistSearch('${aid}')">
+      <div id="sp-all-results"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>`);
+  const inp = document.getElementById('sp-all-search');
+  if (inp) { inp.value = ar.name; inp.focus(); spAllArtistSearch(aid); }
+}
+
+let spAllTimer = null;
+async function spAllArtistSearch(aid) {
+  clearTimeout(spAllTimer);
+  const q = document.getElementById('sp-all-search')?.value.trim();
+  const resultsEl = document.getElementById('sp-all-results');
+  if (!resultsEl || !q) return;
+  resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">Searching…</div></div>`;
+  spAllTimer = setTimeout(async () => {
+    const res = await spotifySearch(q, 'artist');
+    const artists = res?.artists?.items?.filter(a => a.name);
+    if (!artists?.length) { resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">No results</div></div>`; return; }
+    resultsEl.innerHTML = `<div class="spotify-results">
+      ${artists.slice(0,5).map(ar => {
+        const img = ar.images?.[2]?.url || ar.images?.[0]?.url || '';
+        return `<div class="spotify-result-item" onclick="spImportAllAlbums('${aid}','${ar.id}','${esc(ar.name).replace(/'/g,"\\'")}')">
+          ${img ? `<img class="spotify-result-img" src="${img}" alt="" style="border-radius:50%;">` : '<div class="spotify-result-img" style="border-radius:50%;"></div>'}
+          <div class="spotify-result-info">
+            <div class="spotify-result-name">${esc(ar.name)}</div>
+            <div class="spotify-result-sub">${(ar.genres||[]).slice(0,2).join(', ') || 'Artist'}</div>
+          </div>
+          <span class="spotify-result-arrow">›</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }, 400);
+}
+
+async function spImportAllAlbums(aid, spotifyArtistId, artistName) {
+  const resultsEl = document.getElementById('sp-all-results');
+  if (resultsEl) resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">Fetching discography…</div></div>`;
+
+  const albumsData = await spotifyGetArtistAlbums(spotifyArtistId);
+  if (!albumsData?.items?.length) { toast('No albums found'); return; }
+
+  // Deduplicate by name (Spotify often has region duplicates)
+  const seen = new Set();
+  const unique = albumsData.items.filter(al => {
+    const key = al.name.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  }).sort((a,b) => (a.release_date||'').localeCompare(b.release_date||''));
+
+  closeModal();
+
+  const ar = data.artists.find(a => a.id === aid);
+  if (!ar) return;
+
+  // Import each album's tracks sequentially
+  let imported = 0;
+  for (const spAl of unique) {
+    const year = spAl.release_date?.slice(0,4) || '';
+    const dateStr = year ? `${year}-01-01` : '';
+    // Skip if album name already exists
+    if (ar.albums.some(a => a.name.toLowerCase() === spAl.name.toLowerCase())) continue;
+
+    const tracksData = await spotifyGetAlbumTracks(spAl.id);
+    const trackNames = tracksData?.items?.map(t => t.name) || [];
+
+    const newAl = { id: uid(), name: spAl.name, date: dateStr, songs: trackNames.map(n => ({ id: uid(), name: n, rating: null })) };
+    ar.albums.push(newAl);
+    imported++;
+  }
+
+  saveData();
+  navigateArtist(aid);
+  toast(`Imported ${imported} album${imported !== 1 ? 's' : ''} ✓`);
+}
+
+/* ─── Now Playing ─── */
+let nowPlayingData = null;
+let nowPlayingTimer = null;
+
+async function fetchNowPlaying() {
+  if (!spotifyIsConnected()) return;
+  const token = spotifyToken();
+  try {
+    const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (res.status === 204 || res.status === 404) { setNowPlayingBtn(null); return; }
+    if (res.status === 401) { spotifyDisconnect(); return; }
+    const json = await res.json();
+    if (json?.is_playing && json?.item) {
+      nowPlayingData = {
+        trackName: json.item.name,
+        albumName: json.item.album?.name,
+        artistName: json.item.artists?.[0]?.name,
+        albumId: json.item.album?.id,
+        year: json.item.album?.release_date?.slice(0,4) || '',
+        trackNum: json.item.track_number,
+        albumImages: json.item.album?.images,
+        albumArtists: json.item.artists,
+        spotifyAlbumId: json.item.album?.id
+      };
+      setNowPlayingBtn(nowPlayingData);
+    } else {
+      setNowPlayingBtn(null);
+    }
+  } catch(e) { /* silent fail */ }
+}
+
+function setNowPlayingBtn(np) {
+  const btn = document.getElementById('now-playing-btn');
+  if (!btn) return;
+  if (!np) { btn.classList.remove('visible'); btn.innerHTML = ''; return; }
+  btn.classList.add('visible');
+  btn.innerHTML = `<div class="now-playing-pulse"></div><span class="now-playing-label">${esc(np.trackName)}</span>`;
+}
+
+async function goToNowPlaying() {
+  if (!nowPlayingData) return;
+  const { artistName, albumName, trackName, year, spotifyAlbumId } = nowPlayingData;
+
+  // Find or create artist
+  let ar = data.artists.find(a => a.name.toLowerCase() === artistName.toLowerCase());
+  if (!ar) {
+    ar = { id: uid(), name: artistName, albums: [] };
+    data.artists.push(ar);
+  }
+
+  // Find or create album
+  let al = ar.albums.find(a => a.name.toLowerCase() === albumName.toLowerCase());
+  if (!al) {
+    // Try to import from Spotify
+    const dateStr = year ? `${year}-01-01` : '';
+    const tracksData = spotifyIsConnected() ? await spotifyGetAlbumTracks(spotifyAlbumId) : null;
+    const trackNames = tracksData?.items?.map(t => t.name) || [trackName];
+    al = { id: uid(), name: albumName, date: dateStr, songs: trackNames.map(n => ({ id: uid(), name: n, rating: null })) };
+    ar.albums.push(al);
+    saveData();
+    toast(`Added ${artistName} · ${albumName}`);
+  }
+
+  // Navigate to album
+  state = { view: 'album', artistId: ar.id, albumId: al.id };
+  render();
+
+  // Scroll to the current song
+  setTimeout(() => {
+    const songIdx = al.songs.findIndex(s => s.name.toLowerCase() === trackName.toLowerCase());
+    if (songIdx >= 0) {
+      const rows = document.querySelectorAll('.song-row');
+      if (rows[songIdx]) {
+        rows[songIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rows[songIdx].style.transition = 'background 0.3s';
+        rows[songIdx].style.background = 'rgba(90,206,160,0.12)';
+        setTimeout(() => { if(rows[songIdx]) rows[songIdx].style.background = ''; }, 1800);
+      }
+    }
+  }, 300);
+}
+
+function startNowPlayingPolling() {
+  if (!spotifyIsConnected()) return;
+  fetchNowPlaying();
+  clearInterval(nowPlayingTimer);
+  nowPlayingTimer = setInterval(fetchNowPlaying, 15000);
+}
+
 /* ─── Updated Settings Modal ─── */
 function showSettingsModal() {
   const totalArtists = data.artists.length;
@@ -1054,7 +1263,7 @@ function showSettingsModal() {
         <div class="settings-row-info">
           ${spConnected
             ? `<div class="spotify-connected"><div class="spotify-dot"></div>Connected</div>
-               <div class="settings-row-sub" style="margin-top:2px;">Use "Import from Spotify" when adding an album</div>`
+               <div class="settings-row-sub" style="margin-top:2px;">Tracklist import + Now Playing active</div>`
             : `<div class="settings-row-title">Connect Spotify</div>
                <div class="settings-row-sub">Auto-fill tracklists when adding albums</div>`
           }
@@ -1147,7 +1356,11 @@ function showAddAlbumModal(aid) {
 
 /* ─── Init ─── */
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
-spotifyHandleCallback().then(() => { loadData(); render(); });
+spotifyHandleCallback().then(() => {
+  loadData();
+  render();
+  startNowPlayingPolling();
+});
 </script>
 </body>
 </html>
