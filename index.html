@@ -256,6 +256,44 @@
 
   /* ── Action Row ── */
   .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  /* ── Settings Button ── */
+  .settings-btn {
+    background: none; border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text-faint); font-size: 18px; width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all var(--trans); flex-shrink: 0;
+    line-height: 1;
+  }
+  .settings-btn:active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+  /* ── Settings Modal ── */
+  .settings-section { margin-bottom: 20px; }
+  .settings-section-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 10px; }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 8px; gap: 12px;
+  }
+  .settings-row-info {}
+  .settings-row-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .settings-row-sub { font-size: 11px; color: var(--text-faint); }
+  .settings-row-action { flex-shrink: 0; }
+
+  /* ── Spotify Search ── */
+  .spotify-connected { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--green); font-weight:500; }
+  .spotify-dot { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; }
+  .spotify-search-wrap { margin-bottom:14px; position:relative; }
+  .spotify-results { background:var(--surface-2); border:1px solid var(--border-2); border-radius:var(--radius); overflow:hidden; margin-top:6px; max-height:260px; overflow-y:auto; }
+  .spotify-result-item { display:flex; align-items:center; gap:12px; padding:11px 14px; border-bottom:1px solid var(--border); cursor:pointer; transition:background var(--trans); }
+  .spotify-result-item:last-child { border-bottom:none; }
+  .spotify-result-item:active { background:var(--surface-3); }
+  .spotify-result-img { width:40px; height:40px; border-radius:4px; object-fit:cover; background:var(--surface-3); flex-shrink:0; }
+  .spotify-result-info { flex:1; min-width:0; }
+  .spotify-result-name { font-size:13px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .spotify-result-sub { font-size:11px; color:var(--text-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .spotify-result-arrow { color:var(--text-faint); font-size:16px; flex-shrink:0; }
+  .spotify-loading { padding:16px; text-align:center; font-size:12px; color:var(--text-faint); }
 </style>
 </head>
 <body>
@@ -264,6 +302,7 @@
     <div class="topbar-logo" onclick="navigateHome()">♩</div>
     <nav class="breadcrumb" id="breadcrumb"></nav>
     <div class="topbar-right" id="topbar-right"></div>
+    <button class="settings-btn" onclick="showSettingsModal()" title="Settings">⚙︎</button>
   </div>
   <div id="content"></div>
 </div>
@@ -690,24 +729,6 @@ function submitArtist() {
   if (!n) return; closeModal(); addArtist(n);
 }
 
-function showAddAlbumModal(aid) {
-  showModal(`
-    <div class="modal-title">New Album</div>
-    <div class="modal-field">
-      <label class="modal-label">Album Name</label>
-      <input class="modal-input" id="m-alname" type="text" placeholder="e.g. DAMN., Mansion…">
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">Release Date</label>
-      <input class="modal-input" id="m-aldate" type="date">
-      <div class="modal-hint">Sorts albums oldest → newest on artist page</div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="submitAlbum('${aid}')">Add Album</button>
-    </div>`);
-}
-
 function submitAlbum(aid) {
   const n = document.getElementById('m-alname')?.value.trim();
   const d = document.getElementById('m-aldate')?.value;
@@ -734,10 +755,353 @@ function submitSongs(aid, alid) {
   if (!names.length) return; closeModal(); addSongs(aid, alid, names);
 }
 
+/* ─── Export / Import / Clear ─── */
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `music-rater-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup downloaded ✓');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (!parsed.artists || !Array.isArray(parsed.artists)) {
+          toast('Invalid backup file'); return;
+        }
+        if (!confirm(`This will replace your current library with the backup (${parsed.artists.length} artists). Continue?`)) return;
+        data = parsed;
+        saveData();
+        navigateHome();
+        toast('Library restored ✓');
+      } catch(err) {
+        toast('Failed to read file');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearAllData() {
+  if (!confirm('Delete your ENTIRE library? This cannot be undone.')) return;
+  if (!confirm('Are you sure? All artists, albums and ratings will be gone.')) return;
+  data = { artists: [] };
+  localStorage.removeItem('music-rater-data');
+  closeModal();
+  navigateHome();
+  toast('Library cleared');
+}
+
+/* ─── Spotify PKCE ─── */
+const SPOTIFY_CLIENT_ID = 'd1aafa67bfa64379a48b4b4eb7f04079';
+const SPOTIFY_REDIRECT   = 'https://viperx1919.github.io/Music-Rater/';
+const SPOTIFY_SCOPES     = 'user-read-private';
+
+function spotifyToken() { return localStorage.getItem('sp_token'); }
+function spotifyExpiry() { return parseInt(localStorage.getItem('sp_expiry')||'0'); }
+function spotifyIsConnected() { return !!spotifyToken() && Date.now() < spotifyExpiry(); }
+
+function spotifyDisconnect() {
+  localStorage.removeItem('sp_token');
+  localStorage.removeItem('sp_expiry');
+  localStorage.removeItem('sp_verifier');
+  localStorage.removeItem('sp_state');
+  closeModal();
+  toast('Spotify disconnected');
+}
+
+async function sha256(plain) {
+  const enc = new TextEncoder().encode(plain);
+  const hash = await crypto.subtle.digest('SHA-256', enc);
+  return btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+function randomStr(len) {
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'').slice(0,len);
+}
+
+async function spotifyLogin() {
+  const verifier = randomStr(64);
+  const challenge = await sha256(verifier);
+  const state = randomStr(16);
+  localStorage.setItem('sp_verifier', verifier);
+  localStorage.setItem('sp_state', state);
+
+  const params = new URLSearchParams({
+    client_id: SPOTIFY_CLIENT_ID,
+    response_type: 'code',
+    redirect_uri: SPOTIFY_REDIRECT,
+    scope: SPOTIFY_SCOPES,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    state
+  });
+  window.location = 'https://accounts.spotify.com/authorize?' + params;
+}
+
+async function spotifyHandleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code  = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+
+  if (error) { history.replaceState({}, '', SPOTIFY_REDIRECT); return; }
+  if (!code) return;
+  if (state !== localStorage.getItem('sp_state')) {
+    history.replaceState({}, '', SPOTIFY_REDIRECT); return;
+  }
+
+  const verifier = localStorage.getItem('sp_verifier');
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: SPOTIFY_REDIRECT,
+      client_id: SPOTIFY_CLIENT_ID,
+      code_verifier: verifier
+    })
+  });
+
+  const json = await res.json();
+  if (json.access_token) {
+    localStorage.setItem('sp_token', json.access_token);
+    localStorage.setItem('sp_expiry', Date.now() + (json.expires_in * 1000));
+    localStorage.removeItem('sp_verifier');
+    localStorage.removeItem('sp_state');
+    toast('Spotify connected ✓');
+  }
+  history.replaceState({}, '', SPOTIFY_REDIRECT);
+}
+
+async function spotifySearch(query, type='album') {
+  const token = spotifyToken();
+  if (!token) return null;
+  const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}&limit=8`, {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (res.status === 401) { spotifyDisconnect(); return null; }
+  return res.json();
+}
+
+async function spotifyGetAlbumTracks(albumId) {
+  const token = spotifyToken();
+  if (!token) return null;
+  const res = await fetch(`https://api.spotify.com/v1/albums/${albumId}/tracks?limit=50`, {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  return res.json();
+}
+
+/* ─── Spotify Import UI ─── */
+let spSearchTimer = null;
+
+function showSpotifyImportModal(aid) {
+  if (!spotifyIsConnected()) {
+    toast('Connect Spotify in Settings first');
+    return;
+  }
+  showModal(`
+    <div class="modal-title">🎵 Import from Spotify</div>
+    <div class="modal-field spotify-search-wrap">
+      <label class="modal-label">Search Album</label>
+      <input class="modal-input" id="sp-search" type="text" placeholder="e.g. DAMN., Mansion, 1989…"
+        oninput="spLiveSearch('${aid}')">
+      <div id="sp-results"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>`);
+  setTimeout(() => document.getElementById('sp-search')?.focus(), 60);
+}
+
+async function spLiveSearch(aid) {
+  clearTimeout(spSearchTimer);
+  const q = document.getElementById('sp-search')?.value.trim();
+  const resultsEl = document.getElementById('sp-results');
+  if (!resultsEl) return;
+  if (!q) { resultsEl.innerHTML = ''; return; }
+
+  resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">Searching…</div></div>`;
+
+  spSearchTimer = setTimeout(async () => {
+    const data = await spotifySearch(q, 'album');
+    if (!data?.albums?.items?.length) {
+      resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">No results</div></div>`;
+      return;
+    }
+    resultsEl.innerHTML = `<div class="spotify-results">
+      ${data.albums.items.map(al => {
+        const img = al.images?.[2]?.url || al.images?.[0]?.url || '';
+        const year = al.release_date?.slice(0,4) || '';
+        const artist = al.artists?.[0]?.name || '';
+        return `<div class="spotify-result-item" onclick="spImportAlbum('${aid}','${al.id}','${esc(al.name)}','${year}','${esc(artist)}')">
+          ${img ? `<img class="spotify-result-img" src="${img}" alt="">` : '<div class="spotify-result-img"></div>'}
+          <div class="spotify-result-info">
+            <div class="spotify-result-name">${esc(al.name)}</div>
+            <div class="spotify-result-sub">${esc(artist)} · ${year}</div>
+          </div>
+          <span class="spotify-result-arrow">›</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }, 400);
+}
+
+async function spImportAlbum(aid, spotifyAlbumId, albumName, year, artistName) {
+  const resultsEl = document.getElementById('sp-results');
+  if (resultsEl) resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">Loading tracks…</div></div>`;
+
+  const tracksData = await spotifyGetAlbumTracks(spotifyAlbumId);
+  if (!tracksData?.items?.length) { toast('Could not load tracks'); return; }
+
+  const trackNames = tracksData.items.map(t => t.name);
+  const dateStr = year ? `${year}-01-01` : '';
+
+  closeModal();
+  addAlbum(aid, albumName, dateStr);
+
+  // find the album we just added (last one)
+  const ar = data.artists.find(a => a.id === aid);
+  const al = ar?.albums[ar.albums.length - 1];
+  if (!al) return;
+
+  trackNames.forEach(n => al.songs.push({ id: uid(), name: n, rating: null }));
+  saveData();
+  navigateAlbum(aid, al.id);
+  toast(`Imported ${trackNames.length} tracks ✓`);
+}
+
+/* ─── Updated Settings Modal ─── */
+function showSettingsModal() {
+  const totalArtists = data.artists.length;
+  const totalAlbums = data.artists.reduce((a,b) => a + b.albums.length, 0);
+  const totalSongs = data.artists.reduce((a,ar) => a + ar.albums.reduce((b,al) => b + al.songs.length, 0), 0);
+  const sizeKb = (JSON.stringify(data).length / 1024).toFixed(1);
+  const spConnected = spotifyIsConnected();
+
+  showModal(`
+    <div class="modal-title">⚙︎ Settings</div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Spotify</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          ${spConnected
+            ? `<div class="spotify-connected"><div class="spotify-dot"></div>Connected</div>
+               <div class="settings-row-sub" style="margin-top:2px;">Use "Import from Spotify" when adding an album</div>`
+            : `<div class="settings-row-title">Connect Spotify</div>
+               <div class="settings-row-sub">Auto-fill tracklists when adding albums</div>`
+          }
+        </div>
+        <div class="settings-row-action">
+          ${spConnected
+            ? `<button class="btn btn-danger btn-sm" onclick="spotifyDisconnect()">Disconnect</button>`
+            : `<button class="btn btn-primary btn-sm" onclick="spotifyLogin()">Connect</button>`
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Backup & Restore</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-title">Export Backup</div>
+          <div class="settings-row-sub">Download your library as a .json file</div>
+        </div>
+        <div class="settings-row-action">
+          <button class="btn btn-ghost btn-sm" onclick="exportData()">Export</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-title">Import Backup</div>
+          <div class="settings-row-sub">Restore from a previously exported file</div>
+        </div>
+        <div class="settings-row-action">
+          <button class="btn btn-ghost btn-sm" onclick="importData()">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Library Info</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-title">${totalArtists} artists · ${totalAlbums} albums · ${totalSongs} songs</div>
+          <div class="settings-row-sub">Stored locally · ${sizeKb} KB used</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Danger Zone</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-title">Clear Library</div>
+          <div class="settings-row-sub">Permanently delete all data</div>
+        </div>
+        <div class="settings-row-action">
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    </div>`);
+}
+
+/* ─── Updated Add Album Modal with Spotify option ─── */
+function showAddAlbumModal(aid) {
+  const spConnected = spotifyIsConnected();
+  showModal(`
+    <div class="modal-title">New Album</div>
+    ${spConnected ? `
+    <div class="modal-field">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="closeModal();showSpotifyImportModal('${aid}')">
+        🎵 Import from Spotify
+      </button>
+      <div class="modal-hint" style="text-align:center;margin-top:8px;">— or add manually below —</div>
+    </div>` : ''}
+    <div class="modal-field">
+      <label class="modal-label">Album Name</label>
+      <input class="modal-input" id="m-alname" type="text" placeholder="e.g. DAMN., Mansion…">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Release Date</label>
+      <input class="modal-input" id="m-aldate" type="date">
+      <div class="modal-hint">Sorts albums oldest → newest on artist page</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAlbum('${aid}')">Add Album</button>
+    </div>`);
+}
+
 /* ─── Init ─── */
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
-loadData();
-render();
+spotifyHandleCallback().then(() => { loadData(); render(); });
 </script>
 </body>
 </html>
