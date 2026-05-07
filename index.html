@@ -711,12 +711,15 @@ function showModal(html) {
 }
 
 function showAddArtistModal() {
+  const spConnected = spotifyIsConnected();
   showModal(`
     <div class="modal-title">New Artist</div>
-    <div class="modal-field">
-      <label class="modal-label">Artist / Band Name</label>
+    <div class="modal-field spotify-search-wrap">
+      <label class="modal-label">Artist Name${spConnected ? ' — search or type' : ''}</label>
       <input class="modal-input" id="m-aname" type="text" placeholder="e.g. NF, Kendrick Lamar…"
+        oninput="${spConnected ? 'spArtistLiveSearch()' : ''}"
         onkeydown="if(event.key==='Enter')submitArtist()">
+      ${spConnected ? '<div id="sp-artist-results"></div>' : ''}
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
@@ -727,6 +730,49 @@ function showAddArtistModal() {
 function submitArtist() {
   const n = document.getElementById('m-aname')?.value.trim();
   if (!n) return; closeModal(); addArtist(n);
+}
+
+let spArtistTimer = null;
+
+async function spArtistLiveSearch() {
+  clearTimeout(spArtistTimer);
+  const q = document.getElementById('m-aname')?.value.trim();
+  const resultsEl = document.getElementById('sp-artist-results');
+  if (!resultsEl) return;
+  if (!q || q.length < 2) { resultsEl.innerHTML = ''; return; }
+
+  resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">Searching…</div></div>`;
+
+  spArtistTimer = setTimeout(async () => {
+    const res = await spotifySearch(q, 'artist');
+    const artists = res?.artists?.items?.filter(a => a.name && a.popularity > 0);
+    if (!artists?.length) {
+      resultsEl.innerHTML = `<div class="spotify-results"><div class="spotify-loading">No results</div></div>`;
+      return;
+    }
+    resultsEl.innerHTML = `<div class="spotify-results">
+      ${artists.slice(0,6).map(ar => {
+        const img = ar.images?.[2]?.url || ar.images?.[0]?.url || '';
+        const genres = ar.genres?.slice(0,2).join(', ') || '';
+        const safeName = ar.name.replace(/'/g, "\\'");
+        return `<div class="spotify-result-item" onclick="spSelectArtist('${safeName}')">
+          ${img ? `<img class="spotify-result-img" src="${img}" alt="" style="border-radius:50%;">` : '<div class="spotify-result-img" style="border-radius:50%;"></div>'}
+          <div class="spotify-result-info">
+            <div class="spotify-result-name">${esc(ar.name)}</div>
+            <div class="spotify-result-sub">${genres || 'Artist'}</div>
+          </div>
+          <span class="spotify-result-arrow">›</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }, 400);
+}
+
+function spSelectArtist(name) {
+  const input = document.getElementById('m-aname');
+  if (input) input.value = name;
+  const resultsEl = document.getElementById('sp-artist-results');
+  if (resultsEl) resultsEl.innerHTML = '';
 }
 
 function submitAlbum(aid) {
