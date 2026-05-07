@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Music Rater">
+<title>Music Rater</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #08090d;
+    --surface:    #0f111a;
+    --surface-2:  #161924;
+    --surface-3:  #1e2233;
+    --border:     #252a3a;
+    --border-2:   #2e3448;
+    --accent:     #c8a84b;
+    --accent-2:   #e2c577;
+    --accent-dim: rgba(200,168,75,0.12);
+    --accent-glow:rgba(200,168,75,0.25);
+    --text:       #e2e4ef;
+    --text-dim:   #7b829e;
+    --text-faint: #454b65;
+    --green:      #5acea0;
+    --yellow:     #e2c577;
+    --red:        #e07070;
+    --radius:     10px;
+    --radius-lg:  16px;
+    --trans:      0.2s ease;
+    --serif:      'Cormorant', Georgia, serif;
+    --sans:       'DM Sans', sans-serif;
+    --mono:       'Fira Code', monospace;
+    --safe-b:     env(safe-area-inset-bottom, 0px);
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+
+  /* ── App Shell ── */
+  #app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+  /* ── Top Bar ── */
+  #topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    z-index: 20;
+  }
+
+  .topbar-logo {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .bc-item { cursor: pointer; transition: color var(--trans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bc-item:hover { color: var(--accent); }
+  .bc-item.active { color: var(--text); font-weight: 500; }
+  .bc-sep { color: var(--text-faint); flex-shrink: 0; }
+
+  .topbar-right { display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* ── Content ── */
+  #content { flex: 1; overflow-y: auto; padding: 20px 18px; padding-bottom: calc(20px + var(--safe-b)); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: var(--radius);
+    border: none; font-family: var(--sans); font-size: 13px;
+    font-weight: 500; cursor: pointer; transition: all var(--trans);
+    white-space: nowrap; text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #0a0b0d; }
+  .btn-primary:active { background: var(--accent-2); }
+  .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border-2); }
+  .btn-ghost:active { background: var(--surface-2); color: var(--text); }
+  .btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(224,112,112,0.3); }
+  .btn-danger:active { background: rgba(224,112,112,0.1); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+
+  /* ── Page Titles ── */
+  .page-title { font-family: var(--serif); font-size: 38px; font-weight: 700; line-height: 1.05; color: var(--text); margin-bottom: 4px; }
+  .page-title em { color: var(--accent); font-style: italic; }
+  .page-subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
+
+  /* ── Stats Row ── */
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .stat-value { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--accent); line-height: 1; margin-bottom: 3px; }
+  .stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── Section Label ── */
+  .sec-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px; }
+
+  /* ── Artist Grid ── */
+  .artist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; }
+  .artist-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px 16px;
+    cursor: pointer; transition: all var(--trans); position: relative; overflow: hidden;
+  }
+  .artist-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent); opacity: 0; transition: opacity var(--trans);
+  }
+  .artist-card:active { background: var(--surface-2); transform: scale(0.98); }
+  .artist-card:active::before { opacity: 1; }
+  .artist-card-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--surface-3); border: 1px solid var(--border-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: var(--accent);
+    font-family: var(--serif); margin-bottom: 12px; text-transform: uppercase;
+  }
+  .artist-card-name { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-bottom: 2px; line-height: 1.2; }
+  .artist-card-meta { font-size: 11px; color: var(--text-faint); margin-bottom: 10px; }
+  .artist-card-score { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+
+  /* ── Chart ── */
+  .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 22px; }
+  .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .chart-title { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--text-dim); }
+  .chart-badge { font-family: var(--mono); font-size: 12px; background: var(--accent-dim); color: var(--accent-2); border: 1px solid rgba(200,168,75,0.2); border-radius: 6px; padding: 2px 9px; }
+  .chart-wrap { height: 170px; position: relative; }
+
+  /* ── Album List ── */
+  .album-list { display: flex; flex-direction: column; gap: 10px; }
+  .album-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: all var(--trans);
+  }
+  .album-row:active { background: var(--surface-2); }
+  .album-year { font-family: var(--mono); font-size: 11px; color: var(--text-faint); min-width: 34px; }
+  .album-row-name { font-family: var(--serif); font-size: 18px; font-weight: 600; flex: 1; line-height: 1.2; }
+  .album-row-meta { font-size: 11px; color: var(--text-faint); }
+  .album-row-score { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+
+  /* ── Album Page Header ── */
+  .album-header { margin-bottom: 22px; }
+  .album-title { font-family: var(--serif); font-size: 36px; font-weight: 700; line-height: 1.05; }
+  .album-artist { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--accent); margin-bottom: 8px; }
+  .meta-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .meta-pill { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--text-dim); }
+
+  /* ── Song List ── */
+  .song-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .song-list-head { display: grid; grid-template-columns: 28px 1fr 46px; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); }
+  .song-row { display: grid; grid-template-columns: 28px 1fr 46px; gap: 8px; padding: 12px 16px; align-items: center; border-bottom: 1px solid var(--border); transition: background var(--trans); }
+  .song-row:last-child { border-bottom: none; }
+  .song-row:active { background: var(--surface-2); }
+  .song-num { font-family: var(--mono); font-size: 11px; color: var(--text-faint); text-align: center; }
+  .song-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .song-name { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rating-row { display: flex; align-items: center; gap: 8px; }
+  input[type="range"].rating-slider {
+    -webkit-appearance: none; appearance: none;
+    flex: 1; height: 4px; border-radius: 2px;
+    background: var(--surface-3); outline: none; cursor: pointer;
+  }
+  input[type="range"].rating-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  input[type="range"].rating-slider::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: none;
+  }
+  .song-score { font-family: var(--mono); font-size: 15px; font-weight: 500; text-align: right; white-space: nowrap; }
+  .song-del { background: none; border: none; color: var(--text-faint); font-size: 13px; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+  .song-del:active { color: var(--red); background: rgba(224,112,112,0.1); }
+
+  /* ── Add Song Inline ── */
+  .add-song-bar { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .add-song-input { flex: 1; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 8px 12px; font-family: var(--sans); font-size: 13px; color: var(--text); outline: none; }
+  .add-song-input:focus { border-color: var(--accent); }
+  .add-song-input::placeholder { color: var(--text-faint); }
+
+  /* ── Rating colors ── */
+  .r-high { color: var(--green); }
+  .r-mid  { color: var(--yellow); }
+  .r-low  { color: var(--red); }
+  .r-none { color: var(--text-faint); }
+
+  /* ── Empty State ── */
+  .empty { text-align: center; padding: 50px 20px; color: var(--text-faint); }
+  .empty-icon { font-size: 42px; margin-bottom: 14px; opacity: 0.5; }
+  .empty-title { font-family: var(--serif); font-size: 20px; color: var(--text-dim); margin-bottom: 6px; }
+  .empty-sub { font-size: 12px; line-height: 1.8; }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn 0.15s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border-2);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 24px 22px calc(24px + var(--safe-b));
+    width: 100%; max-width: 520px;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-title { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-bottom: 18px; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+  .modal-input { width: 100%; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 10px 13px; font-family: var(--sans); font-size: 15px; color: var(--text); outline: none; -webkit-appearance: none; }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-input::placeholder { color: var(--text-faint); }
+  textarea.modal-input { resize: none; height: 110px; line-height: 1.6; }
+  .modal-hint { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: calc(18px + var(--safe-b)); left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface-3); border: 1px solid var(--border-2);
+    border-radius: var(--radius); padding: 9px 16px; font-size: 12px;
+    color: var(--text); z-index: 200; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  .toast-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  /* ── Action Row ── */
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="topbar-logo" onclick="navigateHome()">♩</div>
+    <nav class="breadcrumb" id="breadcrumb"></nav>
+    <div class="topbar-right" id="topbar-right"></div>
+  </div>
+  <div id="content"></div>
+</div>
+<div id="toast"><div class="toast-dot"></div><span id="toast-msg">Saved</span></div>
+
+<script>
+/* ─── State ─── */
+let state = { view: 'home', artistId: null, albumId: null };
+let data = { artists: [] };
+let charts = {};
+
+/* ─── Storage ─── */
+function loadData() {
+  try {
+    const raw = localStorage.getItem('music-rater-data');
+    if (raw) data = JSON.parse(raw);
+  } catch(e) { data = { artists: [] }; }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('music-rater-data', JSON.stringify(data));
+    toast('Saved ✓');
+  } catch(e) { toast('Save failed'); }
+}
+
+/* ─── Utils ─── */
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function initial(name) { return name.trim().charAt(0).toUpperCase(); }
+
+function ratingColor(r) {
+  if (r === null || r === undefined || isNaN(r)) return 'r-none';
+  return r >= 8 ? 'r-high' : r >= 6 ? 'r-mid' : 'r-low';
+}
+function fmtRating(r) {
+  if (r === null || r === undefined || isNaN(r)) return '—';
+  return parseFloat(r).toFixed(1);
+}
+
+function avgRatings(songs) {
+  const rated = (songs || []).filter(s => s.rating !== null && s.rating !== undefined && !isNaN(s.rating));
+  if (!rated.length) return null;
+  return rated.reduce((a,b) => a + b.rating, 0) / rated.length;
+}
+function albumAvg(al) { return avgRatings(al.songs); }
+function artistAvg(ar) {
+  const avgs = (ar.albums || []).map(albumAvg).filter(v => v !== null);
+  if (!avgs.length) return null;
+  return avgs.reduce((a,b) => a+b, 0) / avgs.length;
+}
+function sortedAlbums(ar) {
+  return [...(ar.albums || [])].sort((a,b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1; if (!b.date) return -1;
+    return new Date(a.date) - new Date(b.date);
+  });
+}
+function albumYear(al) { return al.date ? new Date(al.date).getFullYear() : '—'; }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ─── Nav ─── */
+function navigateHome() { state = { view:'home', artistId:null, albumId:null }; render(); }
+function navigateArtist(id) { state = { view:'artist', artistId:id, albumId:null }; render(); }
+function navigateAlbum(aid, alid) { state = { view:'album', artistId:aid, albumId:alid }; render(); }
+
+/* ─── CRUD ─── */
+function addArtist(name) {
+  const ar = { id:uid(), name:name.trim(), albums:[] };
+  data.artists.push(ar);
+  saveData(); navigateArtist(ar.id);
+}
+function deleteArtist(id) {
+  if (!confirm('Delete this artist and all their albums?')) return;
+  data.artists = data.artists.filter(a => a.id !== id);
+  saveData(); navigateHome();
+}
+function addAlbum(aid, name, date) {
+  const ar = data.artists.find(a => a.id === aid);
+  if (!ar) return;
+  const al = { id:uid(), name:name.trim(), date:date||'', songs:[] };
+  ar.albums.push(al);
+  saveData(); navigateAlbum(aid, al.id);
+}
+function deleteAlbum(aid, alid) {
+  if (!confirm('Delete this album and all its songs?')) return;
+  const ar = data.artists.find(a => a.id === aid);
+  if (!ar) return;
+  ar.albums = ar.albums.filter(al => al.id !== alid);
+  saveData(); navigateArtist(aid);
+}
+function addSongs(aid, alid, names) {
+  const ar = data.artists.find(a => a.id === aid);
+  const al = ar?.albums.find(al => al.id === alid);
+  if (!al) return;
+  names.forEach(n => { if (n.trim()) al.songs.push({ id:uid(), name:n.trim(), rating:null }); });
+  saveData(); render();
+}
+function deleteSong(aid, alid, sid) {
+  const ar = data.artists.find(a => a.id === aid);
+  const al = ar?.albums.find(al => al.id === alid);
+  if (!al) return;
+  al.songs = al.songs.filter(s => s.id !== sid);
+  saveData(); render();
+}
+function setRating(aid, alid, sid, val) {
+  const ar = data.artists.find(a => a.id === aid);
+  const al = ar?.albums.find(al => al.id === alid);
+  const s = al?.songs.find(s => s.id === sid);
+  if (!s) return;
+  s.rating = val;
+  saveData();
+  // Soft update: just refresh score display + chart
+  const rvEl = document.getElementById('rv-' + sid);
+  if (rvEl) { rvEl.textContent = fmtRating(val); rvEl.className = 'song-score ' + ratingColor(val); }
+  renderAlbumChart(al);
+  const badge = document.getElementById('album-avg-badge');
+  const avg = albumAvg(al);
+  if (badge) { badge.textContent = avg !== null ? avg.toFixed(2) : '—'; badge.className = 'chart-badge ' + ratingColor(avg); }
+}
+
+/* ─── Charts ─── */
+function destroyChart(k) { if(charts[k]){charts[k].destroy();delete charts[k];} }
+
+Chart.defaults.color = '#6b7280';
+Chart.defaults.font.family = "'Fira Code', monospace";
+Chart.defaults.font.size = 10;
+
+function mkGradient(ctx, c1, c2) {
+  const g = ctx.createLinearGradient(0,0,0,160);
+  g.addColorStop(0, c1); g.addColorStop(1, c2); return g;
+}
+
+function renderArtistChart(ar) {
+  destroyChart('artist');
+  const canvas = document.getElementById('artist-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const sorted = sortedAlbums(ar);
+  const labels = sorted.map(al => al.name.length > 14 ? al.name.slice(0,13)+'…' : al.name);
+  const vals = sorted.map(al => albumAvg(al));
+
+  charts['artist'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: vals,
+        borderColor: '#c8a84b',
+        backgroundColor: mkGradient(ctx,'rgba(200,168,75,0.3)','rgba(200,168,75,0)'),
+        borderWidth: 2, tension: 0.4, fill: true,
+        pointRadius: 6, pointBackgroundColor: '#c8a84b',
+        pointBorderColor: '#08090d', pointBorderWidth: 2,
+        pointHoverRadius: 9, pointHoverBackgroundColor: '#e2c577',
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 500 },
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor:'#1e2233', borderColor:'#2e3448', borderWidth:1, padding:10, titleColor:'#e2e4ef', bodyColor:'#7b829e', callbacks:{ label: ctx => ` ${ctx.parsed.y!==undefined?ctx.parsed.y.toFixed(1):'—'}` } }
+      },
+      scales: {
+        x: { grid:{color:'#1e2233'}, ticks:{color:'#454b65',maxRotation:30,font:{size:9}}, border:{color:'#252a3a'} },
+        y: { min:0, max:10, grid:{color:'#1e2233'}, ticks:{color:'#454b65',stepSize:2}, border:{color:'#252a3a'} }
+      }
+    }
+  });
+}
+
+function renderAlbumChart(al) {
+  destroyChart('album');
+  const canvas = document.getElementById('album-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const labels = al.songs.map((s,i) => `${i+1}`);
+  const vals = al.songs.map(s => s.rating !== null ? s.rating : null);
+  const avg = albumAvg(al);
+  const datasets = [{
+    label: 'Rating',
+    data: vals,
+    borderColor: '#5acea0',
+    backgroundColor: mkGradient(ctx,'rgba(90,206,160,0.25)','rgba(90,206,160,0)'),
+    borderWidth: 2, tension: 0.35, fill: true,
+    pointRadius: 5, pointBackgroundColor: '#5acea0',
+    pointBorderColor: '#08090d', pointBorderWidth: 2,
+    pointHoverRadius: 8, spanGaps: true
+  }];
+  if (avg !== null) datasets.push({
+    label: 'Avg', data: al.songs.map(() => avg),
+    borderColor: 'rgba(200,168,75,0.6)', backgroundColor: 'transparent',
+    borderWidth: 1.5, borderDash:[6,4], pointRadius: 0, tension: 0
+  });
+
+  charts['album'] = new Chart(ctx, {
+    type: 'line', data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation:{ duration:400 },
+      plugins: { legend:{display:false}, tooltip:{ backgroundColor:'#1e2233', borderColor:'#2e3448', borderWidth:1, padding:10, titleColor:'#e2e4ef', bodyColor:'#7b829e', callbacks:{ title: items => `Track ${items[0].label}`, label: ctx => ` ${ctx.parsed.y!==null?ctx.parsed.y.toFixed(1):'—'}` } } },
+      scales: {
+        x: { grid:{color:'#1e2233'}, ticks:{color:'#454b65'}, border:{color:'#252a3a'} },
+        y: { min:0, max:10, grid:{color:'#1e2233'}, ticks:{color:'#454b65',stepSize:2}, border:{color:'#252a3a'} }
+      }
+    }
+  });
+}
+
+/* ─── Render ─── */
+function render() {
+  renderBreadcrumb();
+  renderTopbarRight();
+  switch(state.view) {
+    case 'home':   renderHome(); break;
+    case 'artist': renderArtistPage(); break;
+    case 'album':  renderAlbumPage(); break;
+  }
+}
+
+function renderBreadcrumb() {
+  const ar = state.artistId ? data.artists.find(a=>a.id===state.artistId) : null;
+  const al = ar && state.albumId ? ar.albums.find(al=>al.id===state.albumId) : null;
+  let html = `<span class="bc-item ${state.view==='home'?'active':''}" onclick="navigateHome()">Library</span>`;
+  if (ar) html += `<span class="bc-sep">›</span><span class="bc-item ${state.view==='artist'?'active':''}" onclick="navigateArtist('${ar.id}')">${esc(ar.name)}</span>`;
+  if (al) html += `<span class="bc-sep">›</span><span class="bc-item active">${esc(al.name)}</span>`;
+  document.getElementById('breadcrumb').innerHTML = html;
+}
+
+function renderTopbarRight() {
+  const el = document.getElementById('topbar-right');
+  const ar = state.artistId ? data.artists.find(a=>a.id===state.artistId) : null;
+  const al = ar && state.albumId ? ar.albums.find(al=>al.id===state.albumId) : null;
+  if (state.view==='home') {
+    el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddArtistModal()">+ Artist</button>`;
+  } else if (state.view==='artist' && ar) {
+    el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddAlbumModal('${ar.id}')">+ Album</button>`;
+  } else if (state.view==='album' && al && ar) {
+    el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddSongModal('${ar.id}','${al.id}')">+ Songs</button>`;
+  } else el.innerHTML = '';
+}
+
+function renderHome() {
+  const { artists } = data;
+  const totalAlbums = artists.reduce((a,b)=>a+b.albums.length,0);
+  const totalSongs = artists.reduce((a,ar)=>a+ar.albums.reduce((b,al)=>b+al.songs.length,0),0);
+
+  let html = `
+    <h1 class="page-title">Your <em>Library</em></h1>
+    <p class="page-subtitle">Rate albums · track your taste over time</p>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">${artists.length}</div><div class="stat-label">Artists</div></div>
+      <div class="stat-card"><div class="stat-value">${totalAlbums}</div><div class="stat-label">Albums</div></div>
+      <div class="stat-card"><div class="stat-value">${totalSongs}</div><div class="stat-label">Rated</div></div>
+    </div>`;
+
+  if (!artists.length) {
+    html += `<div class="empty"><div class="empty-icon">🎵</div><div class="empty-title">No artists yet</div><div class="empty-sub">Tap <strong>+ Artist</strong> to add<br>your first artist and start rating.</div></div>`;
+  } else {
+    html += `<div class="sec-label">All Artists</div><div class="artist-grid">`;
+    html += artists.map(ar => {
+      const avg = artistAvg(ar);
+      return `<div class="artist-card" onclick="navigateArtist('${ar.id}')">
+        <div class="artist-card-avatar">${initial(ar.name)}</div>
+        <div class="artist-card-name">${esc(ar.name)}</div>
+        <div class="artist-card-meta">${ar.albums.length} album${ar.albums.length!==1?'s':''}</div>
+        <div class="artist-card-score ${ratingColor(avg)}">${fmtRating(avg)} <span style="font-size:11px;color:var(--text-faint);font-family:var(--sans);">/ 10</span></div>
+      </div>`;
+    }).join('');
+    html += `</div>`;
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderArtistPage() {
+  const ar = data.artists.find(a=>a.id===state.artistId);
+  if (!ar) { navigateHome(); return; }
+  const avg = artistAvg(ar);
+  const sorted = sortedAlbums(ar);
+
+  let html = `
+    <h1 class="page-title">${esc(ar.name)}</h1>
+    <div class="action-row">
+      ${avg !== null ? `<span class="meta-pill">Avg: <strong class="${ratingColor(avg)}">${avg.toFixed(2)}</strong> / 10</span>` : ''}
+      <span class="meta-pill">${ar.albums.length} albums</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteArtist('${ar.id}')">Delete</button>
+    </div>`;
+
+  if (sorted.length) {
+    html += `<div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">Album Ratings · Over Time</div>
+        ${avg!==null?`<span id="artist-avg-badge" class="chart-badge ${ratingColor(avg)}">${avg.toFixed(2)}</span>`:''}
+      </div>
+      <div class="chart-wrap"><canvas id="artist-chart"></canvas></div>
+    </div>
+    <div class="sec-label">Albums · Chronological</div>
+    <div class="album-list">
+    ${sorted.map(al=>{
+      const alAvg = albumAvg(al);
+      return `<div class="album-row" onclick="navigateAlbum('${ar.id}','${al.id}')">
+        <span class="album-year">${albumYear(al)}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="album-row-name">${esc(al.name)}</div>
+          <div class="album-row-meta">${al.songs.length} track${al.songs.length!==1?'s':''}</div>
+        </div>
+        <div class="album-row-score ${ratingColor(alAvg)}">${fmtRating(alAvg)}</div>
+      </div>`;
+    }).join('')}
+    </div>`;
+  } else {
+    html += `<div class="empty"><div class="empty-icon">💿</div><div class="empty-title">No albums yet</div><div class="empty-sub">Tap <strong>+ Album</strong> to add one.</div></div>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+  if (sorted.length) renderArtistChart(ar);
+}
+
+function renderAlbumPage() {
+  const ar = data.artists.find(a=>a.id===state.artistId);
+  const al = ar?.albums.find(al=>al.id===state.albumId);
+  if (!al) { navigateArtist(state.artistId); return; }
+  const avg = albumAvg(al);
+
+  let html = `
+    <div class="album-header">
+      <div class="album-title">${esc(al.name)}</div>
+      <div class="album-artist">${esc(ar.name)}</div>
+      <div class="meta-pills">
+        ${al.date?`<span class="meta-pill">${albumYear(al)}</span>`:''}
+        <span class="meta-pill">${al.songs.length} tracks</span>
+        ${avg!==null?`<span class="meta-pill">Avg: <strong class="${ratingColor(avg)}">${avg.toFixed(2)}</strong></span>`:''}
+        <button class="btn btn-danger btn-sm" onclick="deleteAlbum('${ar.id}','${al.id}')">Delete Album</button>
+      </div>
+    </div>`;
+
+  if (al.songs.length) {
+    html += `<div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">Song Ratings</div>
+        <span id="album-avg-badge" class="chart-badge ${ratingColor(avg)}">${avg!==null?avg.toFixed(2):'—'}</span>
+      </div>
+      <div class="chart-wrap"><canvas id="album-chart"></canvas></div>
+    </div>
+    <div class="sec-label">Tracklist</div>
+    <div class="song-list">
+      <div class="song-list-head"><span>#</span><span>Title + Rating</span><span style="text-align:right">Score</span></div>
+      ${al.songs.map((s,i)=>{
+        const rv = s.rating !== null && !isNaN(s.rating) ? s.rating : 5;
+        return `<div class="song-row">
+          <span class="song-num">${i+1}</span>
+          <div class="song-main">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="song-name">${esc(s.name)}</span>
+              <button class="song-del" onclick="deleteSong('${ar.id}','${al.id}','${s.id}')" title="Remove">✕</button>
+            </div>
+            <div class="rating-row">
+              <input type="range" class="rating-slider" min="0" max="10" step="0.1" value="${rv}"
+                oninput="document.getElementById('rv-${s.id}').textContent=parseFloat(this.value).toFixed(1);document.getElementById('rv-${s.id}').className='song-score '+(parseFloat(this.value)>=8?'r-high':parseFloat(this.value)>=6?'r-mid':'r-low');"
+                onchange="setRating('${ar.id}','${al.id}','${s.id}',parseFloat(this.value))"
+              >
+            </div>
+          </div>
+          <div class="song-score ${ratingColor(s.rating)}" id="rv-${s.id}">${fmtRating(s.rating)}</div>
+        </div>`;
+      }).join('')}
+      <div class="add-song-bar">
+        <input class="add-song-input" id="quick-add-input" type="text" placeholder="Add a song…" onkeydown="if(event.key==='Enter')quickAddSong('${ar.id}','${al.id}')">
+        <button class="btn btn-ghost btn-sm" onclick="quickAddSong('${ar.id}','${al.id}')">Add</button>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="empty"><div class="empty-icon">🎤</div><div class="empty-title">No songs yet</div><div class="empty-sub">Tap <strong>+ Songs</strong> to add tracks.</div></div>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+  if (al.songs.length) renderAlbumChart(al);
+}
+
+function quickAddSong(aid, alid) {
+  const input = document.getElementById('quick-add-input');
+  const name = input?.value.trim();
+  if (!name) return;
+  input.value = '';
+  addSongs(aid, alid, [name]);
+}
+
+/* ─── Modals ─── */
+function closeModal() { const m = document.getElementById('modal-bd'); if(m) m.remove(); }
+
+function showModal(html) {
+  closeModal();
+  const bd = document.createElement('div');
+  bd.id = 'modal-bd'; bd.className = 'modal-backdrop';
+  bd.innerHTML = `<div class="modal">${html}</div>`;
+  bd.addEventListener('click', e => { if(e.target===bd) closeModal(); });
+  document.body.appendChild(bd);
+  setTimeout(()=>{ const inp = bd.querySelector('input,textarea'); if(inp) inp.focus(); }, 60);
+}
+
+function showAddArtistModal() {
+  showModal(`
+    <div class="modal-title">New Artist</div>
+    <div class="modal-field">
+      <label class="modal-label">Artist / Band Name</label>
+      <input class="modal-input" id="m-aname" type="text" placeholder="e.g. NF, Kendrick Lamar…"
+        onkeydown="if(event.key==='Enter')submitArtist()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitArtist()">Add Artist</button>
+    </div>`);
+}
+
+function submitArtist() {
+  const n = document.getElementById('m-aname')?.value.trim();
+  if (!n) return; closeModal(); addArtist(n);
+}
+
+function showAddAlbumModal(aid) {
+  showModal(`
+    <div class="modal-title">New Album</div>
+    <div class="modal-field">
+      <label class="modal-label">Album Name</label>
+      <input class="modal-input" id="m-alname" type="text" placeholder="e.g. DAMN., Mansion…">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Release Date</label>
+      <input class="modal-input" id="m-aldate" type="date">
+      <div class="modal-hint">Sorts albums oldest → newest on artist page</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAlbum('${aid}')">Add Album</button>
+    </div>`);
+}
+
+function submitAlbum(aid) {
+  const n = document.getElementById('m-alname')?.value.trim();
+  const d = document.getElementById('m-aldate')?.value;
+  if (!n) return; closeModal(); addAlbum(aid, n, d);
+}
+
+function showAddSongModal(aid, alid) {
+  showModal(`
+    <div class="modal-title">Add Songs</div>
+    <div class="modal-field">
+      <label class="modal-label">Track Names</label>
+      <textarea class="modal-input" id="m-songs" placeholder="One per line:&#10;Mansion&#10;Got You On My Mind&#10;Paralyzed"></textarea>
+      <div class="modal-hint">Paste a full tracklist — one song per line</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitSongs('${aid}','${alid}')">Add Tracks</button>
+    </div>`);
+}
+
+function submitSongs(aid, alid) {
+  const raw = document.getElementById('m-songs')?.value || '';
+  const names = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  if (!names.length) return; closeModal(); addSongs(aid, alid, names);
+}
+
+/* ─── Init ─── */
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+loadData();
+render();
+</script>
+</body>
+</html>
