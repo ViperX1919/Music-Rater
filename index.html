@@ -12,19 +12,20 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#08090d;--surf:#0f111a;--s2:#161924;--s3:#1e2233;
-  --bdr:#252a3a;--b2:#2e3448;
-  --acc:#c8a84b;--a2:#e2c577;--adim:rgba(200,168,75,.12);
-  --txt:#e2e4ef;--dim:#7b829e;--fnt:#454b65;
-  --grn:#5acea0;--yel:#e2c577;--red:#e07070;
-  --r:10px;--rl:16px;--tr:.18s ease;
-  --f1:'Cormorant',Georgia,serif;--f2:'DM Sans',sans-serif;--f3:'Fira Code',monospace;
-  --sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px);
+--bg:#08090d;--surf:#0f111a;--s2:#161924;--s3:#1e2233;
+--bdr:#252a3a;--b2:#2e3448;
+--acc:#c8a84b;--a2:#e2c577;--adim:rgba(200,168,75,.12);
+--txt:#e2e4ef;--dim:#7b829e;--fnt:#454b65;
+--grn:#5acea0;--yel:#e2c577;--red:#e07070;
+--r:10px;--rl:16px;--tr:.18s ease;
+--f1:'Cormorant',Georgia,serif;--f2:'DM Sans',sans-serif;--f3:'Fira Code',monospace;
+--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px);
 }
 html{height:100%}
 body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:var(--f2);font-size:14px;line-height:1.6;overflow:hidden;position:fixed}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:99px}
 #app{display:flex;flex-direction:column;height:100vh}
+
 /* Topbar */
 #topbar{display:flex;align-items:center;gap:8px;padding:12px 14px;padding-top:calc(12px + var(--st));background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;z-index:20;touch-action:none;user-select:none;-webkit-user-select:none}
 #logo{font-family:var(--f1);font-size:20px;font-weight:700;color:var(--acc);cursor:pointer;flex-shrink:0}
@@ -33,6 +34,7 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .bci:active,.bci.cur{color:var(--txt);font-weight:500}
 .bcs{color:var(--fnt);flex-shrink:0}
 #topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
 /* Buttons */
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r);font-family:var(--f2);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;padding:8px 14px}
 .btn-p{background:var(--acc);color:#08090d}.btn-p:active{background:var(--a2)}
@@ -41,6 +43,7 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .btn-sm{padding:5px 11px;font-size:12px;border-radius:7px}
 .icon-btn{width:34px;height:34px;padding:0;border-radius:var(--r);background:transparent;border:1px solid var(--bdr);color:var(--fnt);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--tr);flex-shrink:0}
 .icon-btn:active{color:var(--acc);border-color:var(--acc);background:var(--adim)}
+
 /* Now Playing */
 #np-btn{height:34px;padding:0 10px;border-radius:var(--r);background:transparent;border:1px solid var(--bdr);display:none;align-items:center;gap:6px;font-family:var(--f2);font-size:11px;cursor:pointer;transition:all var(--tr);flex-shrink:0;max-width:130px}
 #np-btn.on{display:flex}
@@ -48,48 +51,61 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .np-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0;animation:pulse 1.5s ease-in-out infinite}
 .np-lbl{color:var(--grn);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
 /* Content */
 #content{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px;padding-bottom:calc(24px + var(--sb));overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+
 /* Typography */
 .page-title{font-family:var(--f1);font-size:36px;font-weight:700;line-height:1.05;margin-bottom:4px}
 .page-title em{color:var(--acc);font-style:italic}
 .page-sub{font-size:13px;color:var(--dim);margin-bottom:16px}
 .sec-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fnt);margin-bottom:10px}
+
 /* Stats */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .stat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;cursor:pointer;transition:background var(--tr)}
 .stat-card:active{background:var(--s2)}
 .stat-val{font-family:var(--f3);font-size:22px;font-weight:500;color:var(--acc);line-height:1;margin-bottom:3px}
 .stat-lbl{font-size:10px;color:var(--fnt);letter-spacing:1px;text-transform:uppercase}
+
 /* Quick nav */
 .quick-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+
 /* Search */
 .search-wrap{margin-bottom:14px}
 .search-inp{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 13px;font-family:var(--f2);font-size:15px;color:var(--txt);outline:none;-webkit-appearance:none}
 .search-inp:focus{border-color:var(--acc)}
 .search-inp::placeholder{color:var(--fnt)}
+
 /* Sort */
 .sort-bar{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
 .sort-bar::-webkit-scrollbar{display:none}
 .sort-pill{background:var(--s2);border:1px solid var(--bdr);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--dim);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all var(--tr)}
 .sort-pill.on{background:var(--adim);border-color:var(--acc);color:var(--a2)}
+
 /* Artist grid */
 .artist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
 .artist-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:16px 14px;cursor:pointer;transition:all var(--tr);position:relative;overflow:hidden}
+.artist-card.pinned{border-color:rgba(200,168,75,.5);background:rgba(200,168,75,.04)}
 .artist-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acc),transparent);opacity:0;transition:opacity var(--tr)}
+.artist-card.pinned::before{opacity:1}
 .artist-card:active{background:var(--s2)}.artist-card:active::before{opacity:1}
-.ac-av{width:38px;height:38px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-family:var(--f1);font-size:16px;font-weight:700;color:var(--acc);margin-bottom:10px;text-transform:uppercase}
+.ac-av{width:38px;height:38px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-family:var(--f1);font-size:16px;font-weight:700;color:var(--acc);margin-bottom:10px;text-transform:uppercase;position:relative}
+.ac-pin-badge{position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#08090d;border:1px solid var(--bg)}
 .ac-nm{font-family:var(--f1);font-size:17px;font-weight:600;line-height:1.2;margin-bottom:2px}
 .ac-mt{font-size:11px;color:var(--fnt);margin-bottom:8px}
 .ac-sc{font-family:var(--f3);font-size:19px;font-weight:500}
+
 /* Rating colours */
 .rhi{color:var(--grn)}.rmd{color:var(--yel)}.rlo{color:var(--red)}.rna{color:var(--fnt)}
+
 /* Chart */
 .chart-box{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;margin-bottom:20px}
 .chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .chart-ttl{font-family:var(--f1);font-size:14px;font-weight:600;color:var(--dim)}
 .chart-badge{font-family:var(--f3);font-size:12px;background:var(--adim);color:var(--a2);border:1px solid rgba(200,168,75,.2);border-radius:6px;padding:2px 9px}
 .chart-wrap{height:160px;position:relative}
+
 /* Album list */
 .album-list{display:flex;flex-direction:column;gap:8px}
 .album-row{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background var(--tr)}
@@ -98,47 +114,59 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .al-main{flex:1;min-width:0}
 .al-nm{font-family:var(--f1);font-size:17px;font-weight:600;line-height:1.2}
 .al-mt{font-size:11px;color:var(--fnt);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
-.mood-tag{font-size:10px;background:var(--s3);border:1px solid var(--bdr);border-radius:10px;padding:1px 7px;color:var(--dim)}
 .al-sc{font-family:var(--f3);font-size:19px;font-weight:500;flex-shrink:0}
+
 /* Album page */
 .al-title{font-family:var(--f1);font-size:32px;font-weight:700;line-height:1.05;margin-bottom:2px}
 .al-artist{font-family:var(--f1);font-size:17px;font-style:italic;color:var(--acc);margin-bottom:8px}
 .meta-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px}
 .mpill{background:var(--s2);border:1px solid var(--bdr);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--dim)}
+
 /* Notes */
 .notes-ta{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 13px;font-family:var(--f2);font-size:13px;color:var(--txt);outline:none;resize:none;min-height:60px;line-height:1.6;margin-bottom:16px;-webkit-appearance:none}
 .notes-ta:focus{border-color:var(--acc)}
 .notes-ta::placeholder{color:var(--fnt)}
-/* Mood */
-.mood-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.mood-opt{font-size:11px;background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:3px 10px;color:var(--dim);cursor:pointer;transition:all var(--tr)}
-.mood-opt.on{background:var(--adim);border-color:var(--acc);color:var(--a2)}
+
 /* Song list */
 .song-list{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden}
-.song-hdr{display:grid;grid-template-columns:24px 1fr 44px;gap:8px;padding:9px 14px;border-bottom:1px solid var(--bdr);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fnt)}
-.song-row{display:grid;grid-template-columns:24px 1fr 44px;gap:8px;padding:11px 14px;align-items:center;border-bottom:1px solid var(--bdr);transition:background var(--tr)}
+.song-hdr{display:grid;grid-template-columns:24px 1fr 44px 28px;gap:8px;padding:9px 14px;border-bottom:1px solid var(--bdr);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fnt)}
+.song-row{display:grid;grid-template-columns:24px 1fr 44px 28px;gap:8px;padding:11px 14px;align-items:center;border-bottom:1px solid var(--bdr);transition:background var(--tr)}
 .song-row:last-of-type{border-bottom:none}
 .song-row:active{background:var(--s2)}
 .song-row.hl{background:rgba(90,206,160,.1)}
 .song-num{font-family:var(--f3);font-size:11px;color:var(--fnt);text-align:center}
 .song-body{display:flex;flex-direction:column;gap:5px;min-width:0}
 .song-top{display:flex;align-items:center;gap:5px}
-.song-nm{font-size:13px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.star-btn{background:none;border:none;font-size:14px;cursor:pointer;padding:0;opacity:.35;transition:opacity var(--tr);flex-shrink:0;line-height:1}
-.star-btn.on{opacity:1}
+.song-nm{font-size:13px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;transition:all var(--tr)}
 .del-btn{background:none;border:none;font-size:12px;color:var(--fnt);cursor:pointer;padding:2px 3px;border-radius:4px;flex-shrink:0;transition:color var(--tr)}
 .del-btn:active{color:var(--red)}
-.rating-row{display:flex;align-items:center;gap:7px}
+.rating-row{display:flex;align-items:center;gap:7px;overflow:hidden;max-height:26px;transition:max-height .22s ease, opacity .22s ease;opacity:1}
+.rating-row.locked{max-height:0;opacity:0;pointer-events:none}
+.song-nm-locked{font-size:12px;color:var(--dim);margin-top:1px;display:none}
+.song-row.is-locked .song-nm-locked{display:block}
 input[type=range].rslider{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:2px;background:var(--s3);outline:none;cursor:pointer}
 input[type=range].rslider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--acc);cursor:pointer;box-shadow:0 0 0 3px var(--adim)}
 input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--acc);cursor:pointer;border:none}
 .song-score{font-family:var(--f3);font-size:14px;font-weight:500;text-align:right;white-space:nowrap}
+
+/* Lock button */
+.lock-btn{background:none;border:none;font-size:13px;cursor:pointer;padding:0;color:var(--fnt);transition:color var(--tr),transform .15s ease;line-height:1;display:flex;align-items:center;justify-content:center}
+.lock-btn:active{transform:scale(.85)}
+.lock-btn.locked{color:var(--acc)}
+
 .add-row{padding:10px 14px;border-top:1px solid var(--bdr);display:flex;gap:8px}
 .add-inp{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:7px 11px;font-family:var(--f2);font-size:13px;color:var(--txt);outline:none;-webkit-appearance:none}
 .add-inp:focus{border-color:var(--acc)}
 .add-inp::placeholder{color:var(--fnt)}
+
 /* Action row */
 .act-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+
+/* Artist star button on artist page */
+.artist-star-btn{background:none;border:1px solid var(--bdr);border-radius:var(--r);font-size:13px;cursor:pointer;padding:5px 11px;color:var(--fnt);font-family:var(--f2);font-weight:500;display:flex;align-items:center;gap:5px;transition:all var(--tr)}
+.artist-star-btn.pinned{background:var(--adim);border-color:var(--acc);color:var(--a2)}
+.artist-star-btn:active{background:var(--s2)}
+
 /* Top list */
 .top-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr)}
 .top-item:last-child{border-bottom:none}
@@ -147,6 +175,7 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .top-nm{font-size:13px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .top-sub{font-size:11px;color:var(--fnt)}
 .top-sc{font-family:var(--f3);font-size:15px;font-weight:500;flex-shrink:0}
+
 /* Wrapped */
 .wrapped-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .wrapped-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:15px}
@@ -154,6 +183,7 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .w-val{font-family:var(--f1);font-size:19px;font-weight:700;color:var(--txt);line-height:1.2}
 .w-sub{font-size:11px;color:var(--dim);margin-top:3px}
 .wacc{color:var(--acc)}
+
 /* Compare */
 .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 .cmp-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:14px;text-align:center;transition:all var(--tr)}
@@ -164,6 +194,7 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .cmp-bar{height:100%;background:var(--acc);border-radius:3px;transition:width .6s ease}
 .cmp-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px}
 .cmp-row:last-child{border-bottom:none}
+
 /* Log */
 .log-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr)}
 .log-row:last-child{border-bottom:none}
@@ -171,17 +202,38 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .log-info{flex:1;min-width:0}
 .log-track{font-size:13px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .log-meta{font-size:11px;color:var(--fnt)}
+
 /* Decades */
 .dec-hdr{font-family:var(--f1);font-size:22px;font-weight:700;color:var(--acc);border-bottom:1px solid var(--bdr);padding-bottom:6px;margin-bottom:12px}
-/* Share card */
-.share-card{background:linear-gradient(135deg,#0f111a,#1e2233);border:1px solid var(--b2);border-radius:var(--rl);padding:24px;margin-bottom:14px;text-align:center}
-.sc-artist{font-family:var(--f1);font-size:13px;color:var(--acc);font-style:italic;margin-bottom:3px}
-.sc-album{font-family:var(--f1);font-size:24px;font-weight:700;margin-bottom:8px}
-.sc-score{font-family:var(--f3);font-size:50px;font-weight:500;color:var(--acc);line-height:1}
-.sc-lbl{font-size:10px;color:var(--fnt);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
-.sc-songs{margin-top:16px;text-align:left}
-.sc-song{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
-.sc-song:last-child{border-bottom:none}
+
+/* ─── Share Card (redesigned) ─── */
+.share-outer{background:linear-gradient(160deg,#0c0e17 0%,#14192b 60%,#0a0c14 100%);border:1px solid var(--b2);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
+.share-header{padding:22px 22px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-start;gap:16px}
+.share-cover{width:56px;height:56px;border-radius:10px;background:var(--s3);border:1px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--f1);font-size:24px;font-weight:700;color:var(--acc)}
+.share-info{flex:1;min-width:0}
+.share-artist{font-family:var(--f1);font-size:12px;font-style:italic;color:var(--acc);margin-bottom:2px;letter-spacing:.3px}
+.share-album{font-family:var(--f1);font-size:22px;font-weight:700;line-height:1.1;margin-bottom:6px}
+.share-meta-row{display:flex;gap:8px;flex-wrap:wrap}
+.share-mpill{font-size:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2px 9px;color:var(--dim)}
+.share-score-block{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.share-score-num{font-family:var(--f3);font-size:38px;font-weight:500;line-height:1}
+.share-score-denom{font-size:10px;color:var(--fnt);letter-spacing:1px;text-transform:uppercase;text-align:right;margin-top:2px}
+.share-chart-section{padding:16px 22px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.share-chart-lbl{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fnt);margin-bottom:10px}
+.share-chart-wrap{height:120px;position:relative;margin-bottom:16px}
+.share-tracks-section{padding:14px 22px 18px}
+.share-tracks-lbl{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fnt);margin-bottom:10px}
+.share-track-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.share-track-row:last-child{border-bottom:none}
+.share-track-num{font-family:var(--f3);font-size:10px;color:var(--fnt);min-width:18px;text-align:right;flex-shrink:0}
+.share-track-name{font-size:12px;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.share-track-bar-wrap{width:60px;height:3px;background:var(--s3);border-radius:2px;flex-shrink:0}
+.share-track-bar{height:100%;border-radius:2px;transition:width .4s ease}
+.share-track-score{font-family:var(--f3);font-size:12px;font-weight:500;min-width:28px;text-align:right;flex-shrink:0}
+.share-footer{padding:10px 22px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between}
+.share-footer-brand{font-family:var(--f1);font-size:12px;color:var(--fnt);font-style:italic}
+.share-footer-hint{font-size:10px;color:var(--fnt);letter-spacing:.5px}
+
 /* Spotify results */
 .sp-box{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);overflow:hidden;margin-top:6px;max-height:240px;overflow-y:auto}
 .sp-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background var(--tr)}
@@ -193,6 +245,7 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .sp-sub{font-size:11px;color:var(--fnt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sp-arr{color:var(--fnt);font-size:15px;flex-shrink:0}
 .sp-loading{padding:14px;text-align:center;font-size:12px;color:var(--fnt)}
+
 /* Settings */
 .set-sec{margin-bottom:18px}
 .set-sec-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fnt);margin-bottom:8px}
@@ -201,6 +254,7 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 .set-sub{font-size:11px;color:var(--fnt)}
 .sp-conn-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--grn);font-weight:500}
 .sp-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0}
+
 /* Modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -215,11 +269,13 @@ input[type=range].rslider::-moz-range-thumb{width:16px;height:16px;border-radius
 textarea.modal-inp{resize:none;height:100px;line-height:1.6}
 .modal-hint{font-size:11px;color:var(--fnt);margin-top:4px}
 .modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
 /* Empty */
 .empty{text-align:center;padding:48px 20px;color:var(--fnt)}
 .empty-ic{font-size:40px;margin-bottom:12px;opacity:.5}
 .empty-tt{font-family:var(--f1);font-size:19px;color:var(--dim);margin-bottom:6px}
 .empty-st{font-size:12px;line-height:1.8}
+
 /* Toast */
 #toast{position:fixed;bottom:calc(16px + var(--sb));left:50%;transform:translateX(-50%) translateY(80px);background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:8px 15px;font-size:12px;color:var(--txt);z-index:200;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -228,58 +284,61 @@ textarea.modal-inp{resize:none;height:100px;line-height:1.6}
 </head>
 <body>
 <div id="app">
-  <div id="topbar">
-    <span id="logo">♩</span>
-    <nav id="breadcrumb"></nav>
-    <div id="topbar-right">
-      <button id="np-btn"></button>
-      <button class="icon-btn" id="btn-settings">⚙︎</button>
-    </div>
-  </div>
-  <div id="content"></div>
+<div id="topbar">
+<span id="logo">♩</span>
+<nav id="breadcrumb"></nav>
+<div id="topbar-right">
+<button id="np-btn"></button>
+<button class="icon-btn" id="btn-settings">⚙︎</button>
+</div>
+</div>
+<div id="content"></div>
 </div>
 <div id="toast"><div class="toast-dot" id="toast-dot"></div><span id="toast-msg"></span></div>
+
 <script>
 'use strict';
+
 /* ─── Constants ─── */
-const SP_CID      = 'd1aafa67bfa64379a48b4b4eb7f04079';
+const SP_CID = 'd1aafa67bfa64379a48b4b4eb7f04079';
 const SP_REDIRECT = 'https://viperx1919.github.io/Music-Rater/';
-const SP_SCOPES   = 'user-read-private user-read-currently-playing user-read-playback-state playlist-read-private playlist-read-collaborative';
-const STORE_KEY   = 'mr-v3';
-const MOODS       = ['hype','chill','emotional','gym','focus','dark','fun','romantic','road trip','late night'];
+const SP_SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state playlist-read-private playlist-read-collaborative';
+const STORE_KEY = 'mr-v3';
 
 /* ─── State ─── */
-let D  = { artists:[], log:[] };              // data
-let ST = { view:'home', aid:null, alid:null, sort:'alpha', q:'', cmpA:null, cmpB:null }; // app state
-let CH = {};                                   // chart instances
-let NP = null;                                 // now playing
+let D = { artists:[], log:[] };
+let ST = { view:'home', aid:null, alid:null, sort:'alpha', q:'', cmpA:null, cmpB:null };
+let CH = {};
+let NP = null;
 let npTimer = null;
 
 /* ─── Storage ─── */
 function loadData() {
   try { const r = localStorage.getItem(STORE_KEY); if (r) D = JSON.parse(r); } catch(e){}
   if (!Array.isArray(D.artists)) D.artists = [];
-  if (!Array.isArray(D.log))     D.log     = [];
-  // Migrate old key
+  if (!Array.isArray(D.log)) D.log = [];
+  // Migrate old keys
   if (!D.artists.length) {
     try { const o = localStorage.getItem('mrdata'); if (o) { const p=JSON.parse(o); if (p.artists?.length) D=p; }} catch(e){}
     try { const o = localStorage.getItem('mrdata-v2'); if (o) { const p=JSON.parse(o); if (p.artists?.length) D=p; }} catch(e){}
   }
-  // Normalise
+  // Normalise — handle old saves gracefully
   D.artists.forEach(ar => {
-    ar.id     = ar.id || uid();
+    ar.id = ar.id || uid();
+    ar.pinned = ar.pinned || false; // NEW: artist pinning
     ar.albums = ar.albums || [];
     ar.albums.forEach(al => {
-      al.id          = al.id || uid();
-      al.songs       = al.songs || [];
-      al.moods       = al.moods || [];
-      al.notes       = al.notes || '';
+      al.id = al.id || uid();
+      al.songs = al.songs || [];
+      // Keep old moods/notes fields silently for compatibility, just don't show them
+      al.notes = al.notes || '';
       al.listenCount = al.listenCount || 0;
-      al.lastListened= al.lastListened || null;
+      al.lastListened = al.lastListened || null;
       al.songs.forEach(s => {
-        s.id      = s.id || uid();
-        s.starred = s.starred || false;
+        s.id = s.id || uid();
+        // Old starred field on songs is silently kept but not used in UI
         if (s.rating === undefined) s.rating = null;
+        if (s.locked === undefined) s.locked = false; // NEW: per-song lock
       });
     });
   });
@@ -294,17 +353,18 @@ function save() {
 function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s) { if (!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function ini(s) { return (s||'?').trim().charAt(0).toUpperCase(); }
-function rc(r)  { const n=Number(r); if (!r && r!==0) return 'rna'; return n>=8?'rhi':n>=6?'rmd':'rlo'; }
-function fr(r)  { if (r===null||r===undefined||isNaN(Number(r))) return '—'; return Number(r).toFixed(1); }
+function rc(r) { const n=Number(r); if (!r && r!==0) return 'rna'; return n>=8?'rhi':n>=6?'rmd':'rlo'; }
+function fr(r) { if (r===null||r===undefined||isNaN(Number(r))) return '—'; return Number(r).toFixed(1); }
 function sAvg(songs) {
   const r=(songs||[]).filter(s=>s.rating!==null&&!isNaN(Number(s.rating)));
   return r.length ? r.reduce((a,b)=>a+Number(b.rating),0)/r.length : null;
 }
-function aAvg(al)  { return sAvg(al.songs); }
+function aAvg(al) { return sAvg(al.songs); }
 function arAvg(ar) { const v=(ar.albums||[]).map(aAvg).filter(v=>v!==null); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; }
 function chrono(ar){ return [...(ar.albums||[])].sort((a,b)=>{ if(!a.date&&!b.date)return 0; if(!a.date)return 1; if(!b.date)return -1; return new Date(a.date)-new Date(b.date); }); }
-function yr(al)    { return al.date ? new Date(al.date).getFullYear() : '—'; }
+function yr(al) { return al.date ? new Date(al.date).getFullYear() : '—'; }
 function fmtDate(ts){ return ts ? new Date(ts).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : ''; }
+function fmtDateFull(str){ if(!str)return''; try{ return new Date(str).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}); }catch(e){return str;} }
 function debounce(fn,ms){ let t; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a),ms); }; }
 function toast(msg,col='var(--grn)'){
   document.getElementById('toast-msg').textContent=msg;
@@ -315,20 +375,31 @@ function toast(msg,col='var(--grn)'){
 }
 
 /* ─── CRUD ─── */
-function getAr(aid)       { return D.artists.find(a=>a.id===aid); }
-function getAl(aid,alid)  { return getAr(aid)?.albums.find(al=>al.id===alid); }
+function getAr(aid) { return D.artists.find(a=>a.id===aid); }
+function getAl(aid,alid) { return getAr(aid)?.albums.find(al=>al.id===alid); }
 function getSong(aid,alid,sid){ return getAl(aid,alid)?.songs.find(s=>s.id===sid); }
 
 function addArtist(name) {
-  const ar={id:uid(),name:name.trim(),albums:[]}; D.artists.push(ar); save(); nav('artist',ar.id);
+  const ar={id:uid(),name:name.trim(),pinned:false,albums:[]}; D.artists.push(ar); save(); nav('artist',ar.id);
 }
 function delArtist(aid) {
   if (!confirm('Delete artist and all their data?')) return;
   D.artists=D.artists.filter(a=>a.id!==aid); save(); nav('home');
 }
+function toggleArtistPin(aid) {
+  const ar=getAr(aid); if(!ar) return;
+  ar.pinned=!ar.pinned; save();
+  // Update button on artist page if visible
+  const btn=document.getElementById('ar-pin-btn');
+  if(btn){ btn.className='artist-star-btn btn-sm'+(ar.pinned?' pinned':''); btn.innerHTML=(ar.pinned?'📌 Pinned':'📌 Pin Artist'); }
+  // Re-render home grid if on home
+  if(ST.view==='home') renderHomeResults();
+  toast(ar.pinned?'Artist pinned ⬆️':'Artist unpinned');
+}
+
 function addAlbum(aid,name,date) {
   const ar=getAr(aid); if(!ar) return;
-  const al={id:uid(),name:name.trim(),date:date||'',songs:[],moods:[],notes:'',listenCount:0,lastListened:null};
+  const al={id:uid(),name:name.trim(),date:date||'',songs:[],notes:'',listenCount:0,lastListened:null};
   ar.albums.push(al); save(); nav('album',aid,al.id);
 }
 function delAlbum(aid,alid) {
@@ -338,36 +409,37 @@ function delAlbum(aid,alid) {
 }
 function addSongs(aid,alid,names) {
   const al=getAl(aid,alid); if(!al) return;
-  names.forEach(n=>{ if(n.trim()) al.songs.push({id:uid(),name:n.trim(),rating:null,starred:false}); });
+  names.forEach(n=>{ if(n.trim()) al.songs.push({id:uid(),name:n.trim(),rating:null,locked:false}); });
   save(); render();
 }
 function delSong(aid,alid,sid) {
   const al=getAl(aid,alid); if(!al) return;
   al.songs=al.songs.filter(s=>s.id!==sid); save(); render();
 }
-function toggleStar(aid,alid,sid) {
+function toggleLock(aid,alid,sid) {
   const s=getSong(aid,alid,sid); if(!s) return;
-  s.starred=!s.starred; save();
-  const btn=document.getElementById('star-'+sid);
-  if (btn) { btn.textContent=s.starred?'⭐':'☆'; btn.classList.toggle('on',s.starred); }
+  s.locked=!s.locked;
+  save();
+  const row=document.getElementById('sr-'+sid);
+  const ratingRow=document.getElementById('rr-'+sid);
+  const lockBtn=document.getElementById('lock-'+sid);
+  if(row) row.classList.toggle('is-locked',s.locked);
+  if(ratingRow) ratingRow.classList.toggle('locked',s.locked);
+  if(lockBtn){ lockBtn.classList.toggle('locked',s.locked); lockBtn.textContent=s.locked?'🔒':'🔓'; }
 }
 function setRating(aid,alid,sid,val) {
   const ar=getAr(aid),al=getAl(aid,alid),s=getSong(aid,alid,sid); if(!s) return;
-  s.rating=Number(val); save();
+  s.rating=Number(val);
   const rv=document.getElementById('rv-'+sid);
   if(rv){rv.textContent=fr(s.rating);rv.className='song-score '+rc(s.rating);}
   drawAlbumChart(al);
   const badge=document.getElementById('alb-avg');
   const a=aAvg(al); if(badge){badge.textContent=a!==null?a.toFixed(2):'—';badge.className='chart-badge '+rc(a);}
+  // Save debounced to avoid hammering
+  clearTimeout(setRating._t);
+  setRating._t=setTimeout(()=>{ try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){} },400);
 }
 function saveNotes(aid,alid,val){ const al=getAl(aid,alid); if(al){al.notes=val;save();} }
-function toggleMood(aid,alid,mood){
-  const al=getAl(aid,alid); if(!al) return;
-  const i=al.moods.indexOf(mood);
-  if(i>=0)al.moods.splice(i,1);else al.moods.push(mood);
-  save();
-  document.querySelectorAll('.mood-opt').forEach(el=>el.classList.toggle('on',al.moods.includes(el.dataset.mood)));
-}
 function logListen(artistName,albumName,trackName) {
   D.log.unshift({ts:Date.now(),artist:artistName,album:albumName,track:trackName});
   if(D.log.length>500) D.log=D.log.slice(0,500);
@@ -380,7 +452,7 @@ function logListen(artistName,albumName,trackName) {
 /* ─── Navigation ─── */
 function nav(view,aid,alid) {
   if (view==='artist' && !getAr(aid)) { toast('Artist not found','var(--red)'); return; }
-  if (view==='album'  && !getAl(aid,alid)) { toast('Album not found','var(--red)'); return; }
+  if (view==='album' && !getAl(aid,alid)) { toast('Album not found','var(--red)'); return; }
   ST={...ST,view,aid:aid||null,alid:alid||null}; render();
 }
 
@@ -389,7 +461,7 @@ function killChart(k){ if(CH[k]){CH[k].destroy();delete CH[k];} }
 Chart.defaults.color='#6b7280'; Chart.defaults.font.family="'Fira Code',monospace"; Chart.defaults.font.size=10;
 function grad(ctx,c1,c2){ const g=ctx.createLinearGradient(0,0,0,150); g.addColorStop(0,c1);g.addColorStop(1,c2);return g; }
 const scaleOpts = { x:{grid:{color:'#1e2233'},ticks:{color:'#454b65',maxRotation:30,font:{size:9}},border:{color:'#252a3a'}}, y:{min:0,max:10,grid:{color:'#1e2233'},ticks:{color:'#454b65',stepSize:2},border:{color:'#252a3a'}} };
-const tipOpts   = {backgroundColor:'#1e2233',borderColor:'#2e3448',borderWidth:1,padding:10,titleColor:'#e2e4ef',bodyColor:'#7b829e'};
+const tipOpts = {backgroundColor:'#1e2233',borderColor:'#2e3448',borderWidth:1,padding:10,titleColor:'#e2e4ef',bodyColor:'#7b829e'};
 
 function drawArtistChart(ar) {
   killChart('artist'); const c=document.getElementById('artist-chart'); if(!c)return;
@@ -403,6 +475,18 @@ function drawAlbumChart(al) {
   const ds=[{label:'Rating',data:al.songs.map(s=>s.rating!==null?Number(s.rating):null),borderColor:'#5acea0',backgroundColor:grad(ctx,'rgba(90,206,160,.25)','rgba(90,206,160,0)'),borderWidth:2,tension:.35,fill:true,pointRadius:5,pointBackgroundColor:'#5acea0',pointBorderColor:'#08090d',pointBorderWidth:2,pointHoverRadius:8,spanGaps:true}];
   if(avg!==null) ds.push({label:'Avg',data:al.songs.map(()=>avg),borderColor:'rgba(200,168,75,.6)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,tension:0});
   CH['album']=new Chart(ctx,{type:'line',data:{labels:al.songs.map((_,i)=>String(i+1)),datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{...tipOpts,callbacks:{title:i=>`Track ${i[0].label}`}}},scales:scaleOpts}});
+}
+
+function drawShareChart(al, canvasId) {
+  killChart('share'); const c=document.getElementById(canvasId); if(!c)return;
+  const ctx=c.getContext('2d'), avg=aAvg(al);
+  const shareScaleOpts={
+    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#454b65',maxRotation:0,font:{size:8}},border:{color:'rgba(255,255,255,.06)'}},
+    y:{min:0,max:10,grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#454b65',stepSize:5,font:{size:8}},border:{color:'rgba(255,255,255,.06)'}}
+  };
+  const ds=[{data:al.songs.map(s=>s.rating!==null?Number(s.rating):null),borderColor:'#5acea0',backgroundColor:(()=>{const g=ctx.createLinearGradient(0,0,0,100);g.addColorStop(0,'rgba(90,206,160,.3)');g.addColorStop(1,'rgba(90,206,160,0)');return g;})(),borderWidth:1.5,tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'#5acea0',pointBorderColor:'#08090d',pointBorderWidth:1,spanGaps:true}];
+  if(avg!==null) ds.push({data:al.songs.map(()=>avg),borderColor:'rgba(200,168,75,.5)',backgroundColor:'transparent',borderWidth:1,borderDash:[4,3],pointRadius:0,tension:0});
+  CH['share']=new Chart(ctx,{type:'line',data:{labels:al.songs.map((_,i)=>String(i+1)),datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},tooltip:{...tipOpts,callbacks:{title:i=>`Track ${i[0].label}`}}},scales:shareScaleOpts}});
 }
 
 /* ─── Render ─── */
@@ -423,11 +507,9 @@ function renderBreadcrumb() {
 
 function renderTopbar() {
   const ar=ST.aid?getAr(ST.aid):null, al=ar&&ST.alid?getAl(ST.aid,ST.alid):null;
-  // NP button
   const np=document.getElementById('np-btn');
   if(NP){np.className='on';np.innerHTML=`<div class="np-dot"></div><span class="np-lbl">${esc(NP.trackName)}</span>`;}
   else{np.className='';np.innerHTML='';}
-  // Remove old dynamic buttons
   document.querySelectorAll('#topbar-right .dyn').forEach(b=>b.remove());
   const insert=(html)=>{ const tmp=document.createElement('div'); tmp.innerHTML=html; Array.from(tmp.children).forEach(c=>{c.classList.add('dyn');document.getElementById('topbar-right').insertBefore(c,document.getElementById('btn-settings'));}); };
   if(ST.view==='home'){
@@ -444,13 +526,32 @@ function renderTopbar() {
 }
 
 /* ─── Views ─── */
-function artistCardHTML(ar){ const a=arAvg(ar); return `<div class="artist-card" data-go="artist" data-aid="${ar.id}"><div class="ac-av">${ini(ar.name)}</div><div class="ac-nm">${esc(ar.name)}</div><div class="ac-mt">${ar.albums.length} album${ar.albums.length!==1?'s':''}</div><div class="ac-sc ${rc(a)}">${fr(a)} <span style="font-size:10px;color:var(--fnt);font-family:var(--f2)">/10</span></div></div>`; }
-function albumRowHTML(al,ar){ const a=aAvg(al); return `<div class="album-row" data-go="album" data-aid="${ar.id}" data-alid="${al.id}"><span class="al-yr">${yr(al)}</span><div class="al-main"><div class="al-nm">${esc(al.name)}</div><div class="al-mt">${al.songs.length} tracks${al.lastListened?` · ${fmtDate(al.lastListened)}`:''}${al.moods.slice(0,2).map(m=>`<span class="mood-tag">${m}</span>`).join('')}</div></div><div class="al-sc ${rc(a)}">${fr(a)}</div></div>`; }
+function artistCardHTML(ar){
+  const a=arAvg(ar);
+  return `<div class="artist-card${ar.pinned?' pinned':''}" data-go="artist" data-aid="${ar.id}">
+    <div class="ac-av">${ini(ar.name)}${ar.pinned?'<div class="ac-pin-badge">📌</div>':''}</div>
+    <div class="ac-nm">${esc(ar.name)}</div>
+    <div class="ac-mt">${ar.albums.length} album${ar.albums.length!==1?'s':''}</div>
+    <div class="ac-sc ${rc(a)}">${fr(a)} <span style="font-size:10px;color:var(--fnt);font-family:var(--f2)">/10</span></div>
+  </div>`;
+}
+
+function albumRowHTML(al,ar){
+  const a=aAvg(al);
+  return `<div class="album-row" data-go="album" data-aid="${ar.id}" data-alid="${al.id}">
+    <span class="al-yr">${yr(al)}</span>
+    <div class="al-main">
+      <div class="al-nm">${esc(al.name)}</div>
+      <div class="al-mt">${al.songs.length} tracks${al.lastListened?` · ${fmtDate(al.lastListened)}`:''}</div>
+    </div>
+    <div class="al-sc ${rc(a)}">${fr(a)}</div>
+  </div>`;
+}
 
 function viewHome() {
   const {artists}=D;
   const totAl=artists.reduce((a,b)=>a+b.albums.length,0);
-  const totR =artists.reduce((a,ar)=>a+ar.albums.reduce((b,al)=>b+al.songs.filter(s=>s.rating!==null).length,0),0);
+  const totR=artists.reduce((a,ar)=>a+ar.albums.reduce((b,al)=>b+al.songs.filter(s=>s.rating!==null).length,0),0);
   document.getElementById('content').innerHTML=`
     <h1 class="page-title">Your <em>Library</em></h1>
     <div class="stats-row">
@@ -467,7 +568,6 @@ function viewHome() {
     </div>
     <div class="search-wrap"><input id="home-q" class="search-inp" type="text" placeholder="Search artists, albums, songs…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${esc(ST.q)}"></div>
     <div id="home-results"></div>`;
-  // Search — addEventListener keeps keyboard open
   const qEl=document.getElementById('home-q');
   qEl.addEventListener('input',()=>{ ST.q=qEl.value; renderHomeResults(); });
   renderHomeResults();
@@ -490,17 +590,26 @@ function renderHomeResults() {
     let h='';
     if(ars.length) h+=`<div class="sec-lbl">Artists</div><div class="artist-grid">${ars.map(artistCardHTML).join('')}</div>`;
     if(als.length) h+=`<div class="sec-lbl" style="margin-top:14px">Albums</div><div class="album-list">${als.slice(0,8).map(({al,ar})=>albumRowHTML(al,ar)).join('')}</div>`;
-    if(sgs.length) h+=`<div class="sec-lbl" style="margin-top:14px">Songs</div><div class="chart-box" style="padding:0 14px">${sgs.slice(0,12).map(({s,al,ar})=>`<div class="top-item" style="cursor:pointer" data-go="album" data-aid="${ar.id}" data-alid="${al.id}"><span class="top-rank">${s.starred?'⭐':'♩'}</span><div class="top-info"><div class="top-nm">${esc(s.name)}</div><div class="top-sub">${esc(ar.name)} · ${esc(al.name)}</div></div><span class="top-sc ${rc(s.rating)}">${fr(s.rating)}</span></div>`).join('')}</div>`;
+    if(sgs.length) h+=`<div class="sec-lbl" style="margin-top:14px">Songs</div><div class="chart-box" style="padding:0 14px">${sgs.slice(0,12).map(({s,al,ar})=>`<div class="top-item" style="cursor:pointer" data-go="album" data-aid="${ar.id}" data-alid="${al.id}"><span class="top-rank">♩</span><div class="top-info"><div class="top-nm">${esc(s.name)}</div><div class="top-sub">${esc(ar.name)} · ${esc(al.name)}</div></div><span class="top-sc ${rc(s.rating)}">${fr(s.rating)}</span></div>`).join('')}</div>`;
     el.innerHTML=h;
   } else {
     let sorted=[...artists];
-    if(ST.sort==='alpha')  sorted.sort((a,b)=>a.name.localeCompare(b.name));
-    else if(ST.sort==='rating') sorted.sort((a,b)=>(arAvg(b)||0)-(arAvg(a)||0));
-    else if(ST.sort==='albums') sorted.sort((a,b)=>b.albums.length-a.albums.length);
-    else if(ST.sort==='recent') sorted.sort((a,b)=>Math.max(0,...b.albums.map(al=>al.lastListened||0))-Math.max(0,...a.albums.map(al=>al.lastListened||0)));
+    // Pinned artists always float to top
+    const pinned=sorted.filter(a=>a.pinned);
+    const unpinned=sorted.filter(a=>!a.pinned);
+    if(ST.sort==='alpha'){ pinned.sort((a,b)=>a.name.localeCompare(b.name)); unpinned.sort((a,b)=>a.name.localeCompare(b.name)); }
+    else if(ST.sort==='rating'){ pinned.sort((a,b)=>(arAvg(b)||0)-(arAvg(a)||0)); unpinned.sort((a,b)=>(arAvg(b)||0)-(arAvg(a)||0)); }
+    else if(ST.sort==='albums'){ pinned.sort((a,b)=>b.albums.length-a.albums.length); unpinned.sort((a,b)=>b.albums.length-a.albums.length); }
+    else if(ST.sort==='recent'){ pinned.sort((a,b)=>Math.max(0,...b.albums.map(al=>al.lastListened||0))-Math.max(0,...a.albums.map(al=>al.lastListened||0))); unpinned.sort((a,b)=>Math.max(0,...b.albums.map(al=>al.lastListened||0))-Math.max(0,...a.albums.map(al=>al.lastListened||0))); }
+    sorted=[...pinned,...unpinned];
     const pills=[['alpha','A–Z'],['rating','Top Rated'],['albums','Most Albums'],['recent','Recently Played']];
     let h=`<div class="sort-bar">${pills.map(([k,l])=>`<span class="sort-pill${ST.sort===k?' on':''}" data-sort="${k}">${l}</span>`).join('')}</div>`;
-    h+=sorted.length?`<div class="artist-grid">${sorted.map(artistCardHTML).join('')}</div>`:`<div class="empty"><div class="empty-ic">🎵</div><div class="empty-tt">No artists yet</div><div class="empty-st">Tap <strong>+ Artist</strong> to get started.</div></div>`;
+    if(pinned.length&&unpinned.length){
+      h+=`<div class="sec-lbl" style="display:flex;align-items:center;gap:6px"><span>📌</span> Pinned</div><div class="artist-grid" style="margin-bottom:16px">${pinned.map(artistCardHTML).join('')}</div>`;
+      h+=`<div class="sec-lbl">All Artists</div><div class="artist-grid">${unpinned.map(artistCardHTML).join('')}</div>`;
+    } else {
+      h+=sorted.length?`<div class="artist-grid">${sorted.map(artistCardHTML).join('')}</div>`:`<div class="empty"><div class="empty-ic">🎵</div><div class="empty-tt">No artists yet</div><div class="empty-st">Tap <strong>+ Artist</strong> to get started.</div></div>`;
+    }
     el.innerHTML=h;
   }
 }
@@ -508,7 +617,13 @@ function renderHomeResults() {
 function viewArtist() {
   const ar=getAr(ST.aid); if(!ar){nav('home');return;}
   const a=arAvg(ar),sorted=chrono(ar);
-  let h=`<h1 class="page-title">${esc(ar.name)}</h1><div class="act-row">${a!==null?`<span class="mpill">Avg: <strong class="${rc(a)}">${a.toFixed(2)}</strong> / 10</span>`:''}<span class="mpill">${ar.albums.length} albums</span><button class="btn btn-d btn-sm" data-del-artist="${ar.id}">Delete</button></div>`;
+  let h=`<h1 class="page-title">${esc(ar.name)}</h1>
+  <div class="act-row">
+    ${a!==null?`<span class="mpill">Avg: <strong class="${rc(a)}">${a.toFixed(2)}</strong> / 10</span>`:''}
+    <span class="mpill">${ar.albums.length} albums</span>
+    <button id="ar-pin-btn" class="artist-star-btn btn-sm${ar.pinned?' pinned':''}" data-pin-artist="${ar.id}">${ar.pinned?'📌 Pinned':'📌 Pin Artist'}</button>
+    <button class="btn btn-d btn-sm" data-del-artist="${ar.id}">Delete</button>
+  </div>`;
   if(sorted.length){
     h+=`<div class="chart-box"><div class="chart-hdr"><div class="chart-ttl">Album Ratings · Over Time</div>${a!==null?`<span class="chart-badge ${rc(a)}">${a.toFixed(2)}</span>`:''}</div><div class="chart-wrap"><canvas id="artist-chart"></canvas></div></div>`;
     h+=`<div class="sec-lbl">Albums · Chronological</div><div class="album-list">${sorted.map(al=>albumRowHTML(al,ar)).join('')}</div>`;
@@ -522,51 +637,53 @@ function viewArtist() {
 function viewAlbum() {
   const ar=getAr(ST.aid),al=getAl(ST.aid,ST.alid);
   if(!al){nav('artist',ST.aid);return;}
-  const a=aAvg(al),starred=al.songs.filter(s=>s.starred);
-  let h=`<div class="al-title">${esc(al.name)}</div><div class="al-artist">${esc(ar.name)}</div>
-    <div class="meta-pills">
-      ${al.date?`<span class="mpill">${yr(al)}</span>`:''}
-      <span class="mpill">${al.songs.length} tracks</span>
-      ${a!==null?`<span class="mpill">Avg: <strong class="${rc(a)}">${a.toFixed(2)}</strong></span>`:''}
-      ${starred.length?`<span class="mpill">⭐ ${starred.length}</span>`:''}
-      ${al.listenCount?`<span class="mpill">▶ ${al.listenCount}</span>`:''}
-      <button class="btn btn-d btn-sm" data-del-album="${ST.aid}|${al.id}">Delete</button>
-      <button class="btn btn-g btn-sm" data-share="${ST.aid}|${al.id}">Share</button>
-    </div>
-    <div class="sec-lbl">Notes</div>
-    <textarea class="notes-ta" id="notes-ta" placeholder="Your thoughts on this album…">${esc(al.notes||'')}</textarea>
-    <div class="sec-lbl">Vibes</div>
-    <div class="mood-sel">${MOODS.map(m=>`<span class="mood-opt${al.moods.includes(m)?' on':''}" data-mood="${m}" data-aid="${ST.aid}" data-alid="${al.id}">${m}</span>`).join('')}</div>`;
+  const a=aAvg(al);
+  let h=`<div class="al-title">${esc(al.name)}</div>
+  <div class="al-artist">${esc(ar.name)}</div>
+  <div class="meta-pills">
+    ${al.date?`<span class="mpill">${yr(al)}</span>`:''}
+    <span class="mpill">${al.songs.length} tracks</span>
+    ${a!==null?`<span class="mpill">Avg: <strong class="${rc(a)}">${a.toFixed(2)}</strong></span>`:''}
+    ${al.listenCount?`<span class="mpill">▶ ${al.listenCount}</span>`:''}
+    <button class="btn btn-d btn-sm" data-del-album="${ST.aid}|${al.id}">Delete</button>
+    <button class="btn btn-g btn-sm" data-share="${ST.aid}|${al.id}">Share</button>
+  </div>
+  <div class="sec-lbl">Notes</div>
+  <textarea class="notes-ta" id="notes-ta" placeholder="Your thoughts on this album…">${esc(al.notes||'')}</textarea>`;
+
   if(al.songs.length){
     h+=`<div class="chart-box"><div class="chart-hdr"><div class="chart-ttl">Song Ratings</div><span id="alb-avg" class="chart-badge ${rc(a)}">${a!==null?a.toFixed(2):'—'}</span></div><div class="chart-wrap"><canvas id="album-chart"></canvas></div></div>`;
   }
+
   h+=`<div class="sec-lbl">Tracklist</div>`;
   if(al.songs.length){
-    h+=`<div class="song-list"><div class="song-hdr"><span>#</span><span>Title</span><span style="text-align:right">Score</span></div>`;
+    h+=`<div class="song-list">
+    <div class="song-hdr"><span>#</span><span>Title</span><span style="text-align:right">Score</span><span></span></div>`;
     h+=al.songs.map((s,i)=>{
       const rv=(s.rating!==null&&!isNaN(Number(s.rating)))?Number(s.rating):5;
-      return `<div class="song-row" id="sr-${s.id}">
+      const locked=s.locked||false;
+      return `<div class="song-row${locked?' is-locked':''}" id="sr-${s.id}">
         <span class="song-num">${i+1}</span>
         <div class="song-body">
           <div class="song-top">
-            <button class="star-btn${s.starred?' on':''}" id="star-${s.id}" data-star="${ST.aid}|${ST.alid}|${s.id}">${s.starred?'⭐':'☆'}</button>
             <span class="song-nm">${esc(s.name)}</span>
             <button class="del-btn" data-del-song="${ST.aid}|${ST.alid}|${s.id}">✕</button>
           </div>
-          <div class="rating-row">
+          <div class="rating-row${locked?' locked':''}" id="rr-${s.id}">
             <input type="range" class="rslider" min="0" max="10" step="0.1" value="${rv}"
               data-rate="${ST.aid}|${ST.alid}|${s.id}">
           </div>
         </div>
         <div class="song-score ${rc(s.rating)}" id="rv-${s.id}">${fr(s.rating)}</div>
+        <button class="lock-btn${locked?' locked':''}" id="lock-${s.id}" data-lock="${ST.aid}|${ST.alid}|${s.id}" title="${locked?'Unlock rating':'Lock rating'}">${locked?'🔒':'🔓'}</button>
       </div>`;
     }).join('');
     h+=`<div class="add-row"><input class="add-inp" id="quick-add" type="text" placeholder="Add a song…" autocomplete="off"><button class="btn btn-g btn-sm" id="btn-quick-add" data-aid="${ST.aid}" data-alid="${al.id}">Add</button></div></div>`;
   } else {
     h+=`<div class="empty"><div class="empty-ic">🎤</div><div class="empty-tt">No songs yet</div><div class="empty-st">Tap <strong>+ Songs</strong> to add tracks.</div></div>`;
   }
+
   document.getElementById('content').innerHTML=h;
-  // Notes listener
   document.getElementById('notes-ta')?.addEventListener('change',function(){ saveNotes(ST.aid,ST.alid,this.value); });
   if(al.songs.length) drawAlbumChart(al);
 }
@@ -576,8 +693,6 @@ function viewLog() {
   let h=`<h1 class="page-title">Listen <em>Log</em></h1><p class="page-sub">${D.log.length} sessions recorded</p>`;
   if(!entries.length){ h+=`<div class="empty"><div class="empty-ic">📋</div><div class="empty-tt">No listens yet</div><div class="empty-st">Use Now Playing to auto-log sessions.</div></div>`; }
   else {
-    const bd={};
-    D.log.forEach(e=>{ const d=new Date(e.ts).toLocaleDateString('en-AU'); bd[d]=(bd[d]||0)+1; });
     h+=`<div class="chart-box"><div class="chart-hdr"><div class="chart-ttl">Activity · Last 14 Days</div></div><div class="chart-wrap"><canvas id="log-chart"></canvas></div></div>`;
     h+=entries.map(e=>`<div class="log-row"><div class="log-dot"></div><div class="log-info"><div class="log-track">${esc(e.track)} — <em>${esc(e.album)}</em></div><div class="log-meta">${esc(e.artist)} · ${fmtDate(e.ts)}</div></div></div>`).join('');
   }
@@ -603,8 +718,8 @@ function viewDecades() {
 }
 
 function viewTop10() {
-  const songs=[],albums=[],starred=[];
-  D.artists.forEach(ar=>ar.albums.forEach(al=>{ al.songs.forEach(s=>{ if(s.rating!==null&&!isNaN(Number(s.rating)))songs.push({s,al,ar}); if(s.starred)starred.push({s,al,ar}); }); const a=aAvg(al); if(a!==null)albums.push({al,ar,a}); }));
+  const songs=[],albums=[];
+  D.artists.forEach(ar=>ar.albums.forEach(al=>{ al.songs.forEach(s=>{ if(s.rating!==null&&!isNaN(Number(s.rating)))songs.push({s,al,ar}); }); const a=aAvg(al); if(a!==null)albums.push({al,ar,a}); }));
   songs.sort((a,b)=>Number(b.s.rating)-Number(a.s.rating));
   albums.sort((a,b)=>b.a-a.a);
   let h=`<h1 class="page-title">Top <em>10</em></h1>`;
@@ -615,7 +730,6 @@ function viewTop10() {
   if(!albums.length) h+=`<div style="padding:16px;color:var(--fnt);font-size:13px">Rate some albums first</div>`;
   else albums.slice(0,10).forEach(({al,ar,a},i)=>{ h+=`<div class="top-item" style="cursor:pointer" data-go="album" data-aid="${ar.id}" data-alid="${al.id}"><span class="top-rank">${i+1}</span><div class="top-info"><div class="top-nm">${esc(al.name)}</div><div class="top-sub">${esc(ar.name)} · ${yr(al)}</div></div><span class="top-sc ${rc(a)}">${a.toFixed(2)}</span></div>`; });
   h+=`</div>`;
-  if(starred.length){ h+=`<div class="sec-lbl" style="margin-top:20px">⭐ Starred</div><div class="chart-box" style="padding:0 14px">${starred.map(({s,al,ar})=>`<div class="top-item"><span class="top-rank">⭐</span><div class="top-info"><div class="top-nm">${esc(s.name)}</div><div class="top-sub">${esc(ar.name)} · ${esc(al.name)}</div></div><span class="top-sc ${rc(s.rating)}">${fr(s.rating)}</span></div>`).join('')}</div>`; }
   document.getElementById('content').innerHTML=h;
 }
 
@@ -627,15 +741,13 @@ function viewWrapped() {
   const ml=D.artists.flatMap(ar=>ar.albums.map(al=>({al,ar}))).sort((a,b)=>(b.al.listenCount||0)-(a.al.listenCount||0))[0];
   const topAr=D.artists.map(ar=>({ar,a:arAvg(ar)})).filter(x=>x.a!==null).sort((a,b)=>b.a-a.a)[0];
   const avgAll=songs.length?songs.reduce((a,b)=>a+Number(b.s.rating),0)/songs.length:null;
-  const mm=MOODS.map(m=>({m,c:D.artists.reduce((a,ar)=>a+ar.albums.filter(al=>al.moods.includes(m)).length,0)})).sort((a,b)=>b.c-a.c)[0];
   let h=`<h1 class="page-title">Your <em>Wrapped</em></h1><p class="page-sub">Stats across your whole library</p><div class="wrapped-grid">`;
-  if(topSong)  h+=`<div class="wrapped-card"><div class="w-lbl">🏆 Top Song</div><div class="w-val">${esc(topSong.s.name)}</div><div class="w-sub">${esc(topSong.ar.name)} · <span class="wacc">${Number(topSong.s.rating).toFixed(1)}</span></div></div>`;
+  if(topSong) h+=`<div class="wrapped-card"><div class="w-lbl">🏆 Top Song</div><div class="w-val">${esc(topSong.s.name)}</div><div class="w-sub">${esc(topSong.ar.name)} · <span class="wacc">${Number(topSong.s.rating).toFixed(1)}</span></div></div>`;
   if(topAlbum) h+=`<div class="wrapped-card"><div class="w-lbl">💿 Top Album</div><div class="w-val">${esc(topAlbum.al.name)}</div><div class="w-sub">${esc(topAlbum.ar.name)} · <span class="wacc">${topAlbum.a.toFixed(2)}</span></div></div>`;
-  if(topAr)    h+=`<div class="wrapped-card"><div class="w-lbl">🎤 Top Artist</div><div class="w-val">${esc(topAr.ar.name)}</div><div class="w-sub">Avg: <span class="wacc">${topAr.a.toFixed(2)}</span></div></div>`;
+  if(topAr) h+=`<div class="wrapped-card"><div class="w-lbl">🎤 Top Artist</div><div class="w-val">${esc(topAr.ar.name)}</div><div class="w-sub">Avg: <span class="wacc">${topAr.a.toFixed(2)}</span></div></div>`;
   if(ml?.al.listenCount) h+=`<div class="wrapped-card"><div class="w-lbl">▶ Most Played</div><div class="w-val">${esc(ml.al.name)}</div><div class="w-sub">${ml.al.listenCount} listens · ${esc(ml.ar.name)}</div></div>`;
   if(avgAll!==null) h+=`<div class="wrapped-card"><div class="w-lbl">📊 Avg Rating</div><div class="w-val wacc">${avgAll.toFixed(2)} / 10</div><div class="w-sub">Across ${songs.length} songs</div></div>`;
   if(botAlbum) h+=`<div class="wrapped-card"><div class="w-lbl">📉 Lowest Album</div><div class="w-val">${esc(botAlbum.al.name)}</div><div class="w-sub">${esc(botAlbum.ar.name)} · <span style="color:var(--red)">${botAlbum.a.toFixed(2)}</span></div></div>`;
-  if(mm?.c)    h+=`<div class="wrapped-card"><div class="w-lbl">🎭 Top Vibe</div><div class="w-val">${mm.m}</div><div class="w-sub">${mm.c} album${mm.c!==1?'s':''}</div></div>`;
   h+=`</div>`;
   document.getElementById('content').innerHTML=h;
 }
@@ -681,19 +793,68 @@ function viewCompare() {
   }
 }
 
-/* ─── Share Card ─── */
+/* ─── Share Card (redesigned) ─── */
 function showShareCard(aid,alid){
   const ar=getAr(aid),al=getAl(aid,alid); if(!al)return;
-  const a=aAvg(al),top=al.songs.filter(s=>s.rating!==null).sort((a,b)=>Number(b.rating)-Number(a.rating)).slice(0,5);
-  openModal(`<div class="modal-title">Share Card</div>
-    <div class="share-card">
-      <div class="sc-artist">${esc(ar.name)}</div><div class="sc-album">${esc(al.name)}</div>
-      <div class="sc-score ${rc(a)}">${a!==null?a.toFixed(2):'—'}</div>
-      <div class="sc-lbl">/ 10 · Music Rater</div>
-      ${top.length?`<div class="sc-songs">${top.map((s,i)=>`<div class="sc-song"><span style="color:var(--fnt);min-width:16px">${i+1}</span><span style="flex:1">${esc(s.name)}</span><span class="${rc(s.rating)}" style="font-family:var(--f3)">${Number(s.rating).toFixed(1)}</span></div>`).join('')}</div>`:''}
+  const a=aAvg(al);
+  const ratedSongs=al.songs.filter(s=>s.rating!==null&&!isNaN(Number(s.rating)));
+  const releaseDate=al.date?fmtDateFull(al.date):'Unknown date';
+  const coverLetter=ini(al.name);
+
+  // Build the mini colour bar for each track
+  function barColour(r){
+    if(r===null||r===undefined)return'#2e3448';
+    const n=Number(r);
+    return n>=8?'#5acea0':n>=6?'#e2c577':'#e07070';
+  }
+
+  const tracksHTML=al.songs.map((s,i)=>{
+    const rated=s.rating!==null&&!isNaN(Number(s.rating));
+    const barW=rated?Math.round((Number(s.rating)/10)*100):0;
+    return `<div class="share-track-row">
+      <span class="share-track-num">${i+1}</span>
+      <span class="share-track-name">${esc(s.name)}</span>
+      <div class="share-track-bar-wrap"><div class="share-track-bar" style="width:${barW}%;background:${barColour(s.rating)}"></div></div>
+      <span class="share-track-score ${rc(s.rating)}">${fr(s.rating)}</span>
+    </div>`;
+  }).join('');
+
+  openModal(`<div class="modal-title">Share</div>
+    <div class="share-outer">
+      <div class="share-header">
+        <div class="share-cover">${coverLetter}</div>
+        <div class="share-info">
+          <div class="share-artist">${esc(ar.name)}</div>
+          <div class="share-album">${esc(al.name)}</div>
+          <div class="share-meta-row">
+            <span class="share-mpill">📅 ${releaseDate}</span>
+            <span class="share-mpill">🎵 ${al.songs.length} track${al.songs.length!==1?'s':''}</span>
+            ${ratedSongs.length?`<span class="share-mpill">${ratedSongs.length} rated</span>`:''}
+          </div>
+        </div>
+        <div class="share-score-block">
+          <div class="share-score-num ${rc(a)}">${a!==null?a.toFixed(2):'—'}</div>
+          <div class="share-score-denom">/ 10</div>
+        </div>
+      </div>
+      ${al.songs.length?`
+      <div class="share-chart-section">
+        <div class="share-chart-lbl">Rating Graph</div>
+        <div class="share-chart-wrap"><canvas id="share-chart"></canvas></div>
+      </div>`:''}
+      <div class="share-tracks-section">
+        <div class="share-tracks-lbl">Full Tracklist</div>
+        ${tracksHTML||'<div style="color:var(--fnt);font-size:12px;padding:4px 0">No ratings yet</div>'}
+      </div>
+      <div class="share-footer">
+        <span class="share-footer-brand">♩ Music Rater</span>
+        <span class="share-footer-hint">Screenshot to share</span>
+      </div>
     </div>
-    <p style="font-size:11px;color:var(--fnt);text-align:center">Screenshot to share!</p>
     <div class="modal-acts"><button class="btn btn-g" data-close-modal>Close</button></div>`);
+
+  // Draw chart after modal is in DOM
+  setTimeout(()=>drawShareChart(al,'share-chart'),60);
 }
 
 /* ─── Modals ─── */
@@ -797,8 +958,8 @@ function clearAll(){
 }
 
 /* ─── Spotify PKCE ─── */
-function spToken()  { return localStorage.getItem('sp_token'); }
-function spOk()     { return !!spToken()&&Date.now()<parseInt(localStorage.getItem('sp_expiry')||'0'); }
+function spToken() { return localStorage.getItem('sp_token'); }
+function spOk() { return !!spToken()&&Date.now()<parseInt(localStorage.getItem('sp_expiry')||'0'); }
 function spDisconnect(){ ['sp_token','sp_expiry','sp_verifier','sp_state'].forEach(k=>localStorage.removeItem(k)); closeModal(); toast('Spotify disconnected'); renderTopbar(); }
 async function sha256(s){ const e=new TextEncoder().encode(s),h=await crypto.subtle.digest('SHA-256',e); return btoa(String.fromCharCode(...new Uint8Array(h))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function randStr(n){ const a=new Uint8Array(n);crypto.getRandomValues(a);return btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'').slice(0,n); }
@@ -830,226 +991,165 @@ async function spFetch(url){
 async function spSearch(q,type){ return spFetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=${type}&limit=8`); }
 async function spAlbumTracks(id){ return spFetch(`https://api.spotify.com/v1/albums/${id}/tracks?limit=50`); }
 async function spArtistAlbums(id){ return spFetch(`https://api.spotify.com/v1/artists/${id}/albums?include_groups=album&limit=50&market=AU`); }
-async function spNowPlaying(){ return spFetch('https://api.spotify.com/v1/me/player/currently-playing'); }
-async function spUserPlaylists(){ return spFetch('https://api.spotify.com/v1/me/playlists?limit=50'); }
-async function spPlaylistTracks(id,offset=0){ return spFetch(`https://api.spotify.com/v1/playlists/${id}/tracks?limit=100&offset=${offset}`); }
 
-function spResultHTML(items,dataAttr){ return `<div class="sp-box">${items.map(x=>{ const img=x.images?.[2]?.url||x.images?.[0]?.url||''; const nm=x.name||x.album?.name||''; const sub=x.genres?.slice(0,2).join(', ')||x.artists?.[0]?.name||x.release_date?.slice(0,4)||''; return `<div class="sp-item" ${dataAttr(x)}>${img?`<img class="sp-img" src="${img}" alt="" style="${x.type==='artist'?'border-radius:50%':''}">`:`<div class="sp-img" style="${x.type==='artist'?'border-radius:50%':''}"></div>`}<div class="sp-info"><div class="sp-nm">${esc(nm)}</div><div class="sp-sub">${esc(sub)}</div></div><span class="sp-arr">›</span></div>`; }).join('')}</div>`; }
-
-async function spArtistSearch(){
-  const q=document.getElementById('m-aname')?.value.trim(),el=document.getElementById('sp-ar-res');if(!el)return;
-  if(!q||q.length<2){el.innerHTML='';return;}
-  el.innerHTML=`<div class="sp-box"><div class="sp-loading">Searching…</div></div>`;
-  const res=await spSearch(q,'artist');
-  const items=(res?.artists?.items||[]).filter(a=>a.name&&a.popularity>0).slice(0,5);
-  if(!items.length){el.innerHTML=`<div class="sp-box"><div class="sp-loading">No results</div></div>`;return;}
-  el.innerHTML=spResultHTML(items,x=>`data-sp-ar-sel="${esc(x.name)}"`);
+async function spNowPlaying(){
+  const d=await spFetch('https://api.spotify.com/v1/me/player/currently-playing');
+  if(!d||!d.item)return null;
+  return {trackName:d.item.name,albumName:d.item.album?.name,artistName:d.item.artists?.[0]?.name,isPlaying:d.is_playing};
+}
+function startNpTimer(){
+  if(npTimer)clearInterval(npTimer);
+  if(!spOk())return;
+  async function poll(){
+    const np=await spNowPlaying();
+    if(np&&np.isPlaying){
+      NP=np;
+    } else { NP=null; }
+    renderTopbar();
+  }
+  poll();
+  npTimer=setInterval(poll,15000);
 }
 
-function modalSpotifyAlbum(aid){
-  openModal(`<div class="modal-title">🎵 Import from Spotify</div>
-    <div class="modal-field"><label class="modal-lbl">Search Album</label><input class="modal-inp" id="sp-al-q" type="text" placeholder="e.g. DAMN., Mansion…" autocomplete="off"><div id="sp-al-res"></div></div>
+async function spArtistSearch(){
+  const q=document.getElementById('m-aname')?.value.trim(); if(!q)return;
+  const el=document.getElementById('sp-ar-res'); if(!el)return;
+  el.innerHTML=`<div class="sp-loading">Searching…</div>`;
+  const d=await spSearch(q,'artist'); if(!d){el.innerHTML='';return;}
+  const items=(d.artists?.items||[]).slice(0,5);
+  if(!items.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="sp-box">${items.map(ar=>`<div class="sp-item" data-sp-artist="${esc(ar.name)}"><img class="sp-img" src="${ar.images?.[2]?.url||''}" onerror="this.style.display='none'"><div class="sp-info"><div class="sp-nm">${esc(ar.name)}</div><div class="sp-sub">${ar.followers?.total?.toLocaleString()||''} followers</div></div><span class="sp-arr">›</span></div>`).join('')}</div>`;
+}
+
+async function modalSpotifyAlbum(aid){
+  openModal(`<div class="modal-title">Import from Spotify</div>
+    <div class="modal-field"><label class="modal-lbl">Search Album</label><input class="modal-inp" id="sp-al-q" type="text" placeholder="Album name…" autocomplete="off"><div id="sp-al-res"></div></div>
     <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button></div>`);
-  document.getElementById('sp-al-q').addEventListener('input',debounce(async()=>{
-    const q=document.getElementById('sp-al-q')?.value.trim(),el=document.getElementById('sp-al-res');if(!el)return;
-    if(!q){el.innerHTML='';return;}
-    el.innerHTML=`<div class="sp-box"><div class="sp-loading">Searching…</div></div>`;
-    const res=await spSearch(q,'album');
-    const items=(res?.albums?.items||[]);
-    if(!items.length){el.innerHTML=`<div class="sp-box"><div class="sp-loading">No results</div></div>`;return;}
-    el.innerHTML=spResultHTML(items,x=>`data-sp-al-import="${x.id}" data-sp-al-name="${esc(x.name)}" data-sp-al-year="${x.release_date?.slice(0,4)||''}" data-sp-al-aid="${aid}"`);
+  const inp=document.getElementById('sp-al-q');
+  inp.addEventListener('input',debounce(async()=>{
+    const q=inp.value.trim(); if(!q)return;
+    const el=document.getElementById('sp-al-res'); if(!el)return;
+    el.innerHTML=`<div class="sp-loading">Searching…</div>`;
+    const d=await spSearch(q,'album'); if(!d){el.innerHTML='';return;}
+    const items=(d.albums?.items||[]).slice(0,6);
+    if(!items.length){el.innerHTML='';return;}
+    el.innerHTML=`<div class="sp-box">${items.map(al=>`<div class="sp-item" data-sp-album-id="${al.id}" data-sp-album-name="${esc(al.name)}" data-sp-album-date="${al.release_date||''}"><img class="sp-img" src="${al.images?.[2]?.url||''}" onerror="this.style.display='none'"><div class="sp-info"><div class="sp-nm">${esc(al.name)}</div><div class="sp-sub">${al.artists?.[0]?.name||''} · ${al.release_date?.slice(0,4)||''}</div></div><span class="sp-arr">›</span></div>`).join('')}</div>`;
   },400));
 }
 
-async function importSpotifyAlbum(aid,spId,name,year){
-  const el=document.getElementById('sp-al-res');if(el)el.innerHTML=`<div class="sp-box"><div class="sp-loading">Loading tracks…</div></div>`;
-  const t=await spAlbumTracks(spId);if(!t?.items?.length){toast('Could not load tracks','var(--red)');return;}
-  const ar=getAr(aid);if(!ar)return;
-  const al={id:uid(),name,date:year?`${year}-01-01`:'',songs:t.items.map(s=>({id:uid(),name:s.name,rating:null,starred:false})),moods:[],notes:'',listenCount:0,lastListened:null};
-  ar.albums.push(al);save();closeModal();nav('album',aid,al.id);toast(`Imported ${al.songs.length} tracks ✓`);
-}
-
-function modalAllAlbums(aid){
-  const ar=getAr(aid);if(!ar)return;
-  openModal(`<div class="modal-title">Import Discography</div>
-    <div class="modal-field"><label class="modal-lbl">Find Artist on Spotify</label><input class="modal-inp" id="sp-disc-q" type="text" value="${esc(ar.name)}" autocomplete="off"><div id="sp-disc-res"></div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button></div>`);
-  const search=debounce(async()=>{
-    const q=document.getElementById('sp-disc-q')?.value.trim(),el=document.getElementById('sp-disc-res');if(!el||!q)return;
-    el.innerHTML=`<div class="sp-box"><div class="sp-loading">Searching…</div></div>`;
-    const res=await spSearch(q,'artist');
-    const items=(res?.artists?.items||[]).filter(a=>a.name).slice(0,5);
-    if(!items.length){el.innerHTML=`<div class="sp-box"><div class="sp-loading">No results</div></div>`;return;}
-    el.innerHTML=spResultHTML(items,x=>`data-sp-disc-import="${x.id}" data-sp-disc-aid="${aid}"`);
-  },400);
-  document.getElementById('sp-disc-q').addEventListener('input',search); search();
-}
-
-async function importAllAlbums(spArId,aid){
-  const el=document.getElementById('sp-disc-res');if(el)el.innerHTML=`<div class="sp-box"><div class="sp-loading">Fetching discography…</div></div>`;
-  const res=await spArtistAlbums(spArId);if(!res?.items?.length){toast('No albums found','var(--red)');return;}
-  const seen=new Set();
-  const unique=res.items.filter(al=>{const k=al.name.toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).sort((a,b)=>(a.release_date||'').localeCompare(b.release_date||''));
-  closeModal(); const ar=getAr(aid);if(!ar)return;
-  let n=0;
-  for(const sp of unique){
-    if(ar.albums.some(a=>a.name.toLowerCase()===sp.name.toLowerCase()))continue;
-    const t=await spAlbumTracks(sp.id);
-    ar.albums.push({id:uid(),name:sp.name,date:sp.release_date?`${sp.release_date.slice(0,4)}-01-01`:'',songs:(t?.items||[]).map(s=>({id:uid(),name:s.name,rating:null,starred:false})),moods:[],notes:'',listenCount:0,lastListened:null});
-    n++;
-  }
-  save();nav('artist',aid);toast(`Imported ${n} albums ✓`);
-}
-
-async function modalPlaylist(){
-  openModal(`<div class="modal-title">🎵 Import Playlist</div>
-    <div class="modal-field"><label class="modal-lbl">Your Playlists</label><div id="pl-list"><div class="sp-box"><div class="sp-loading">Loading…</div></div></div></div>
-    <div class="modal-field"><label class="modal-lbl">Or paste a Playlist URL</label><input class="modal-inp" id="pl-url" type="text" placeholder="https://open.spotify.com/playlist/…" autocomplete="off"><div class="modal-hint">Paste the Spotify link or just the ID</div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="pl-url-ok">Import by URL</button></div>`);
-  document.getElementById('pl-url-ok').onclick=()=>{
-    let raw=document.getElementById('pl-url')?.value.trim()||'';
-    const m=raw.match(/playlist\/([a-zA-Z0-9]+)/); const id=m?m[1]:raw.split('?')[0].trim();
-    if(!id){toast('Invalid URL','var(--red)');return;} importPlaylist(id,'Playlist');
-  };
-  const res=await spUserPlaylists();
-  const el=document.getElementById('pl-list');if(!el)return;
-  if(!res?.items?.length){el.innerHTML=`<div class="sp-box"><div class="sp-loading">No playlists found</div></div>`;return;}
-  el.innerHTML=spResultHTML(res.items.filter(p=>p),x=>`data-pl-import="${x.id}" data-pl-name="${esc(x.name)}"`);
-}
-
-async function importPlaylist(id,name){
-  const el=document.getElementById('pl-list');if(el)el.innerHTML=`<div class="sp-box"><div class="sp-loading">Loading tracks…</div></div>`;
-  let all=[],offset=0;
-  while(true){
-    const res=await spPlaylistTracks(id,offset);if(!res?.items?.length)break;
-    all=[...all,...res.items.filter(i=>i?.track?.name)];
-    if(!res.next||all.length>=500)break; offset+=100;
-  }
-  if(!all.length){toast('No tracks found','var(--red)');return;}
+async function importSpotifyAlbum(aid,albumId,albumName,albumDate){
+  toast('Importing tracks…');
+  const d=await spAlbumTracks(albumId); if(!d){toast('Failed','var(--red)');return;}
+  const names=(d.items||[]).map(t=>t.name);
   closeModal();
-  let ar=D.artists.find(a=>a.name==='My Playlists');
-  if(!ar){ar={id:uid(),name:'My Playlists',albums:[]};D.artists.push(ar);}
-  const songs=all.map(i=>({id:uid(),name:`${i.track.name}  —  ${i.track.artists?.[0]?.name||''}`,rating:null,starred:false}));
-  const al={id:uid(),name,date:'',songs,moods:[],notes:'Imported from Spotify',listenCount:0,lastListened:null};
-  ar.albums.push(al);save();nav('album',ar.id,al.id);toast(`Imported ${songs.length} tracks ✓`);
+  const ar=getAr(aid); if(!ar)return;
+  const al={id:uid(),name:albumName,date:albumDate,songs:[],notes:'',listenCount:0,lastListened:null};
+  ar.albums.push(al);
+  names.forEach(n=>{ if(n.trim()) al.songs.push({id:uid(),name:n.trim(),rating:null,locked:false}); });
+  save(); nav('album',aid,al.id); toast(`Imported ${names.length} tracks ✓`);
 }
 
-/* ─── Now Playing ─── */
-async function pollNP(){
-  if(!spOk())return;
-  try{
-    const j=await spNowPlaying();
-    NP=j?.is_playing&&j?.item?{trackName:j.item.name,albumName:j.item.album?.name,artistName:j.item.artists?.[0]?.name,year:j.item.album?.release_date?.slice(0,4)||'',spAlbumId:j.item.album?.id}:null;
-  }catch(e){NP=null;}
-  const btn=document.getElementById('np-btn');if(!btn)return;
-  if(NP){btn.className='on';btn.innerHTML=`<div class="np-dot"></div><span class="np-lbl">${esc(NP.trackName)}</span>`;}
-  else{btn.className='';btn.innerHTML='';}
-}
-async function goToNP(){
-  if(!NP)return;
-  const{artistName,albumName,trackName,year,spAlbumId}=NP;
-  let ar=D.artists.find(a=>a.name.toLowerCase()===artistName.toLowerCase());
-  if(!ar){ar={id:uid(),name:artistName,albums:[]};D.artists.push(ar);}
-  let al=ar.albums.find(a=>a.name.toLowerCase()===albumName.toLowerCase());
-  if(!al){
-    const t=await spAlbumTracks(spAlbumId);
-    al={id:uid(),name:albumName,date:year?`${year}-01-01`:'',songs:(t?.items||[]).map(s=>({id:uid(),name:s.name,rating:null,starred:false})),moods:[],notes:'',listenCount:0,lastListened:null};
-    ar.albums.push(al);save();toast(`Added ${artistName} · ${albumName}`);
-  }
-  logListen(artistName,albumName,trackName);
-  nav('album',ar.id,al.id);
-  setTimeout(()=>{
-    const i=al.songs.findIndex(s=>s.name.toLowerCase()===trackName.toLowerCase());
-    if(i>=0){const rows=document.querySelectorAll('.song-row');if(rows[i]){rows[i].scrollIntoView({behavior:'smooth',block:'center'});rows[i].classList.add('hl');setTimeout(()=>rows[i]?.classList.remove('hl'),2000);}}
-  },350);
+async function importAllSpotifyAlbums(aid){
+  const ar=getAr(aid); if(!ar)return;
+  toast('Searching Spotify…');
+  const d=await spSearch(ar.name,'artist'); if(!d)return;
+  const artItem=d.artists?.items?.[0]; if(!artItem){toast('Artist not found on Spotify','var(--red)');return;}
+  const albums=await spArtistAlbums(artItem.id); if(!albums)return;
+  const items=(albums.items||[]);
+  if(!items.length){toast('No albums found','var(--red)');return;}
+  openModal(`<div class="modal-title">Import All Albums</div>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:14px">Found ${items.length} albums for <strong>${esc(ar.name)}</strong>. This will import all tracks without ratings.</p>
+    <div style="max-height:200px;overflow-y:auto;margin-bottom:14px">${items.map(al=>`<div style="padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--dim)">${esc(al.name)} <span style="color:var(--fnt)">(${al.release_date?.slice(0,4)||'?'})</span></div>`).join('')}</div>
+    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-import-all">Import All</button></div>`);
+  document.getElementById('m-import-all').onclick=async()=>{
+    closeModal(); toast('Importing…');
+    for(const al of items){
+      const existing=ar.albums.find(a=>a.name.toLowerCase()===al.name.toLowerCase());
+      if(existing)continue;
+      const tracks=await spAlbumTracks(al.id);
+      const newAl={id:uid(),name:al.name,date:al.release_date||'',songs:[],notes:'',listenCount:0,lastListened:null};
+      (tracks?.items||[]).forEach(t=>{ if(t.name.trim()) newAl.songs.push({id:uid(),name:t.name.trim(),rating:null,locked:false}); });
+      ar.albums.push(newAl);
+    }
+    save(); render(); toast(`Imported ${items.length} albums ✓`);
+  };
 }
 
-/* ─── Global Event Delegation ─── */
-document.addEventListener('click',function(e){
-  const t=e.target;
-  // Close modal
-  if(t.hasAttribute('data-close-modal')||t.closest('[data-close-modal]')){closeModal();return;}
-  // Navigate
-  const go=t.closest('[data-go]');
-  if(go){
-    const v=go.dataset.go,aid=go.dataset.aid,alid=go.dataset.alid;
-    if(['log','decades','top10','wrapped','compare'].includes(v)){ST={...ST,view:v,aid:null,alid:null};render();return;}
-    if(v==='home'){nav('home');return;}
-    if(v==='artist'){nav('artist',aid);return;}
-    if(v==='album'){nav('album',aid,alid);return;}
+/* ─── Global event delegation ─── */
+document.addEventListener('click', e => {
+  const t=e.target.closest('[data-go],[data-del-artist],[data-del-album],[data-del-song],[data-share],[data-sort],[data-close-modal],[data-pin-artist],[data-lock],[data-sp-artist],[data-sp-album-id]');
+  if(!t)return;
+
+  if(t.dataset.go){
+    const {go,aid,alid}=t.dataset;
+    if(go==='home') nav('home');
+    else if(go==='artist') nav('artist',aid);
+    else if(go==='album') nav('album',aid,alid);
+    else nav(go);
     return;
   }
-  // Sort pill
-  const sp=t.closest('[data-sort]');
-  if(sp){ST.sort=sp.dataset.sort;renderHomeResults();return;}
-  // Mood
-  const mo=t.closest('[data-mood]');
-  if(mo){toggleMood(mo.dataset.aid,mo.dataset.alid,mo.dataset.mood);return;}
-  // Del artist
-  const da=t.closest('[data-del-artist]');
-  if(da){delArtist(da.dataset.delArtist);return;}
-  // Del album
-  const dal=t.closest('[data-del-album]');
-  if(dal){const[aid,alid]=dal.dataset.delAlbum.split('|');delAlbum(aid,alid);return;}
-  // Del song
-  const ds=t.closest('[data-del-song]');
-  if(ds){const[aid,alid,sid]=ds.dataset.delSong.split('|');delSong(aid,alid,sid);return;}
-  // Star
-  const st=t.closest('[data-star]');
-  if(st){const[aid,alid,sid]=st.dataset.star.split('|');toggleStar(aid,alid,sid);return;}
-  // Share
-  const sh=t.closest('[data-share]');
-  if(sh){const[aid,alid]=sh.dataset.share.split('|');showShareCard(aid,alid);return;}
-  // Topbar dynamic buttons
-  if(t.id==='tb-add-ar'){modalAddArtist();return;}
-  if(t.id==='tb-add-al'){modalAddAlbum(t.dataset.aid);return;}
-  if(t.id==='tb-all-al'){modalAllAlbums(t.dataset.aid);return;}
-  if(t.id==='tb-add-songs'){modalAddSongs(t.dataset.aid,t.dataset.alid);return;}
-  if(t.id==='tb-playlist'){modalPlaylist();return;}
-  // Spotify artist select in modal
-  const spar=t.closest('[data-sp-ar-sel]');
-  if(spar){const inp=document.getElementById('m-aname');if(inp)inp.value=spar.dataset.spArSel;document.getElementById('sp-ar-res').innerHTML='';return;}
-  // Spotify album import
-  const spal=t.closest('[data-sp-al-import]');
-  if(spal){importSpotifyAlbum(spal.dataset.spAlAid,spal.dataset.spAlImport,spal.dataset.spAlName,spal.dataset.spAlYear);return;}
-  // Spotify discography import
-  const spd=t.closest('[data-sp-disc-import]');
-  if(spd){importAllAlbums(spd.dataset.spDiscImport,spd.dataset.spDiscAid);return;}
-  // Playlist import
-  const pl=t.closest('[data-pl-import]');
-  if(pl){importPlaylist(pl.dataset.plImport,pl.dataset.plName||'Playlist');return;}
-  // Quick add
-  if(t.id==='btn-quick-add'){const inp=document.getElementById('quick-add');if(inp?.value.trim()){addSongs(t.dataset.aid,t.dataset.alid,[inp.value]);inp.value='';} return;}
-});
+  if(t.dataset.delArtist){ delArtist(t.dataset.delArtist); return; }
+  if(t.dataset.delAlbum){ const [a,al]=t.dataset.delAlbum.split('|'); delAlbum(a,al); return; }
+  if(t.dataset.delSong){ const [a,al,s]=t.dataset.delSong.split('|'); delSong(a,al,s); return; }
+  if(t.dataset.share){ const [a,al]=t.dataset.share.split('|'); showShareCard(a,al); return; }
+  if(t.dataset.sort){ ST.sort=t.dataset.sort; renderHomeResults(); return; }
+  if(t.dataset.closeModal){ closeModal(); return; }
+  if(t.dataset.pinArtist){ toggleArtistPin(t.dataset.pinArtist); return; }
+  if(t.dataset.lock){ const [a,al,s]=t.dataset.lock.split('|'); toggleLock(a,al,s); return; }
+  if(t.dataset.spArtist){ const inp=document.getElementById('m-aname'); if(inp){inp.value=t.dataset.spArtist;document.getElementById('sp-ar-res').innerHTML='';} return; }
+  if(t.dataset.spAlbumId){ importSpotifyAlbum(ST.aid,t.dataset.spAlbumId,t.dataset.spAlbumName,t.dataset.spAlbumDate); return; }
 
-// Sliders — input for live, change to save
-document.getElementById('content').addEventListener('input',function(e){
-  const t=e.target;
-  if(t.dataset.rate){const[aid,alid,sid]=t.dataset.rate.split('|');const v=parseFloat(t.value);const rv=document.getElementById('rv-'+sid);if(rv){rv.textContent=v.toFixed(1);rv.className='song-score '+rc(v);}}
-});
-document.getElementById('content').addEventListener('change',function(e){
-  const t=e.target;
-  if(t.dataset.rate){const[aid,alid,sid]=t.dataset.rate.split('|');setRating(aid,alid,sid,parseFloat(t.value));}
-});
-// Quick add enter
-document.getElementById('content').addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&e.target.id==='quick-add'){
-    const btn=document.getElementById('btn-quick-add');
-    if(btn&&e.target.value.trim()){addSongs(btn.dataset.aid,btn.dataset.alid,[e.target.value]);e.target.value='';}
+  // Topbar dynamic buttons
+  if(t.id==='tb-add-ar'){ modalAddArtist(); return; }
+  if(t.id==='tb-add-al'){ modalAddAlbum(t.dataset.aid); return; }
+  if(t.id==='tb-all-al'){ importAllSpotifyAlbums(ST.aid); return; }
+  if(t.id==='tb-add-songs'){ modalAddSongs(t.dataset.aid,t.dataset.alid); return; }
+  if(t.id==='tb-playlist'){ /* playlist feature */ return; }
+  if(t.id==='btn-settings'){ modalSettings(); return; }
+  if(t.id==='np-btn'&&NP){ logListen(NP.artistName,NP.albumName,NP.trackName); toast('Logged ✓'); return; }
+  if(t.id==='logo'){ nav('home'); return; }
+
+  // Breadcrumb navigation
+  const bci=e.target.closest('.bci[data-go]');
+  if(bci){
+    if(bci.dataset.go==='home') nav('home');
+    else if(bci.dataset.go==='artist') nav('artist',bci.dataset.aid);
+    return;
+  }
+
+  // Quick add song button
+  if(t.id==='btn-quick-add'){
+    const inp=document.getElementById('quick-add');
+    const n=inp?.value.trim(); if(!n)return;
+    addSongs(t.dataset.aid,t.dataset.alid,[n]);
+    inp.value='';
+    return;
   }
 });
 
-document.getElementById('logo').onclick=()=>nav('home');
-document.getElementById('btn-settings').onclick=modalSettings;
-document.getElementById('np-btn').onclick=goToNP;
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+// Rating sliders
+document.addEventListener('input', e => {
+  const t=e.target;
+  if(t.classList.contains('rslider')&&t.dataset.rate){
+    const [a,al,s]=t.dataset.rate.split('|');
+    setRating(a,al,s,t.value);
+  }
+});
+
+// Quick add enter key
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter'&&e.target.id==='quick-add'){
+    const btn=document.getElementById('btn-quick-add');
+    if(btn) btn.click();
+  }
+});
 
 /* ─── Init ─── */
 async function init(){
   loadData();
   await spHandleCallback();
   render();
-  if(spOk()){pollNP();npTimer=setInterval(pollNP,15000);}
+  startNpTimer();
 }
 init();
 </script>
