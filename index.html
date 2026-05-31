@@ -63,14 +63,15 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .sec-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fnt);margin-bottom:10px}
 
 /* Stats */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;cursor:pointer;transition:background var(--tr)}
 .stat-card:active{background:var(--s2)}
 .stat-val{font-family:var(--f3);font-size:22px;font-weight:500;color:var(--acc);line-height:1;margin-bottom:3px}
 .stat-lbl{font-size:10px;color:var(--fnt);letter-spacing:1px;text-transform:uppercase}
 
-/* Quick nav */
-.quick-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+/* Quick nav — single row, scaled to fit */
+.quick-nav{display:flex;gap:5px;flex-wrap:nowrap;margin-bottom:14px;overflow:hidden}
+.quick-nav .btn{flex:1;justify-content:center;padding:5px 4px;font-size:11px;border-radius:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Search */
 .search-wrap{margin-bottom:14px}
@@ -145,7 +146,7 @@ body{height:100%;width:100%;background:var(--bg);color:var(--txt);font-family:va
 .del-btn:active{color:var(--red)}
 .song-row.is-locked .del-btn{display:none}
 
-/* Rating slider — more tactile/3D feel */
+/* Rating slider */
 .rating-row{display:flex;align-items:center;gap:7px;overflow:hidden;max-height:32px;transition:max-height .22s ease,opacity .22s ease,margin .22s ease;opacity:1;margin-top:3px}
 .rating-row.locked{max-height:0;opacity:0;pointer-events:none;margin-top:0}
 
@@ -198,7 +199,7 @@ input[type=range].rslider::-moz-range-progress{background:var(--acc);height:6px;
 /* Action row */
 .act-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
 
-/* Artist pin button — sits in top-right of artist card */
+/* Artist pin button — grid card only */
 .ac-pin-btn{
   position:absolute;top:8px;right:8px;
   width:22px;height:22px;padding:0;
@@ -235,7 +236,7 @@ input[type=range].rslider::-moz-range-progress{background:var(--acc);height:6px;
 .w-sub{font-size:11px;color:var(--dim);margin-top:3px}
 .wacc{color:var(--acc)}
 
-/* Compare — up to 4 albums */
+/* Compare */
 .cmp-selects{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .cmp-cards{display:grid;gap:10px;margin-bottom:18px}
 .cmp-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:14px;text-align:center;transition:all var(--tr);position:relative}
@@ -304,6 +305,9 @@ input[type=range].rslider::-moz-range-progress{background:var(--acc);height:6px;
 .share-footer-brand{font-family:var(--f1);font-size:12px;color:var(--fnt);font-style:italic}
 .share-footer-hint{font-size:10px;color:var(--fnt);letter-spacing:.5px}
 
+/* Share modal action buttons — centred */
+.share-acts{display:flex;gap:8px;justify-content:center;margin-top:4px;flex-wrap:wrap}
+
 /* Spotify results */
 .sp-box{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);overflow:hidden;margin-top:6px;max-height:240px;overflow-y:auto}
 .sp-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background var(--tr)}
@@ -337,7 +341,6 @@ input[type=range].rslider::-moz-range-progress{background:var(--acc);height:6px;
 .modal-inp:focus{border-color:var(--acc)}
 .modal-inp::placeholder{color:var(--fnt)}
 textarea.modal-inp{resize:none;height:100px;line-height:1.6}
-.modal-hint{font-size:11px;color:var(--fnt);margin-top:4px}
 .modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 
 /* Empty */
@@ -346,7 +349,7 @@ textarea.modal-inp{resize:none;height:100px;line-height:1.6}
 .empty-tt{font-family:var(--f1);font-size:19px;color:var(--dim);margin-bottom:6px}
 .empty-st{font-size:12px;line-height:1.8}
 
-/* Toast — with undo support */
+/* Toast */
 #toast{
   position:fixed;bottom:calc(16px + var(--sb));left:50%;
   transform:translateX(-50%) translateY(80px);
@@ -399,7 +402,7 @@ const SP_CID = 'd1aafa67bfa64379a48b4b4eb7f04079';
 const SP_REDIRECT = 'https://viperx1919.github.io/Music-Rater/';
 const SP_SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state playlist-read-private playlist-read-collaborative';
 const STORE_KEY = 'mr-v3';
-const CMP_MAX = 4; // max albums to compare
+const CMP_MAX = 4;
 
 /* ─── State ─── */
 let D = { artists:[] };
@@ -408,23 +411,16 @@ let CH = {};
 let NP = null;
 let npTimer = null;
 
-// Undo stack: {type, data, restore fn}
-let _undoStack = [];
-let _undoTimer = null;
-
 /* ─── Storage ─── */
 function loadData() {
   try { const r = localStorage.getItem(STORE_KEY); if (r) D = JSON.parse(r); } catch(e){}
   if (!Array.isArray(D.artists)) D.artists = [];
-  // Drop old log key
   delete D.log;
-  // Migrate old keys
   if (!D.artists.length) {
     ['mrdata','mrdata-v2'].forEach(k => {
       try { const o = localStorage.getItem(k); if (o) { const p=JSON.parse(o); if (p.artists?.length) D.artists=p.artists; }} catch(e){}
     });
   }
-  // Normalise
   D.artists.forEach(ar => {
     ar.id = ar.id || uid();
     ar.pinned = ar.pinned || false;
@@ -437,7 +433,6 @@ function loadData() {
       al.lastListened = al.lastListened || null;
       al.songs.forEach(s => {
         s.id = s.id || uid();
-        // silently ignore old fields (starred, moods/vibes, locked)
         if (s.rating === undefined) s.rating = null;
         if (s.locked === undefined) s.locked = false;
       });
@@ -477,10 +472,7 @@ function toast(msg, col='var(--grn)', undoFn=null){
   const undoBtn=document.getElementById('toast-undo');
   if(undoFn){
     undoBtn.classList.add('visible');
-    undoBtn.onclick=()=>{
-      undoFn();
-      const el=document.getElementById('toast'); el.classList.remove('show');
-    };
+    undoBtn.onclick=()=>{ undoFn(); const el=document.getElementById('toast'); el.classList.remove('show'); };
   } else {
     undoBtn.classList.remove('visible');
     undoBtn.onclick=null;
@@ -506,26 +498,18 @@ function delArtist(aid) {
   D.artists.splice(idx,1);
   try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){}
   nav('home');
-  toast('Artist deleted', 'var(--red)', ()=>{
-    D.artists.splice(idx,0,snapshot);
-    save(); render();
-  });
+  toast('Artist deleted', 'var(--red)', ()=>{ D.artists.splice(idx,0,snapshot); save(); render(); });
 }
 function toggleArtistPin(aid) {
   const ar=getAr(aid); if(!ar) return;
   ar.pinned=!ar.pinned; save();
-  // update all pin buttons for this artist on the page
   document.querySelectorAll(`.ac-pin-btn[data-pin-artist="${aid}"]`).forEach(btn=>{
     btn.className='ac-pin-btn'+(ar.pinned?' pinned':'');
     btn.title=ar.pinned?'Unpin':'Pin artist';
   });
-  // update card border class
   document.querySelectorAll(`.artist-card[data-aid="${aid}"]`).forEach(card=>{
     card.classList.toggle('pinned',ar.pinned);
   });
-  // also update artist page pin btn if present
-  const btn=document.getElementById('ar-pin-btn');
-  if(btn){ btn.className='artist-pin-btn'+(ar.pinned?' pinned':''); }
   if(ST.view==='home') renderHomeResults();
   toast(ar.pinned?'Artist pinned ⬆️':'Artist unpinned');
 }
@@ -543,11 +527,7 @@ function delAlbum(aid,alid) {
   ar.albums.splice(idx,1);
   try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){}
   nav('artist',aid);
-  toast('Album deleted','var(--red)',()=>{
-    const ar2=getAr(aid); if(!ar2)return;
-    ar2.albums.splice(idx,0,snapshot);
-    save(); render();
-  });
+  toast('Album deleted','var(--red)',()=>{ const ar2=getAr(aid); if(!ar2)return; ar2.albums.splice(idx,0,snapshot); save(); render(); });
 }
 function addSongs(aid,alid,names) {
   const al=getAl(aid,alid); if(!al) return;
@@ -561,11 +541,7 @@ function delSong(aid,alid,sid) {
   al.songs.splice(idx,1);
   try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){}
   render();
-  toast('Track deleted','var(--red)',()=>{
-    const al2=getAl(aid,alid); if(!al2)return;
-    al2.songs.splice(idx,0,snapshot);
-    save(); render();
-  });
+  toast('Track deleted','var(--red)',()=>{ const al2=getAl(aid,alid); if(!al2)return; al2.songs.splice(idx,0,snapshot); save(); render(); });
 }
 
 function toggleLock(aid,alid,sid) {
@@ -609,7 +585,6 @@ function setRating(aid,alid,sid,val) {
   if(rv){rv.textContent=fr(s.rating);rv.className='song-score '+rc(s.rating);}
   const ls=document.getElementById('ls-'+sid);
   if(ls&&s.locked)ls.textContent=fr(s.rating)+' / 10';
-  // update slider fill
   const sldr=document.querySelector(`input.rslider[data-rate*="|${sid}"]`);
   if(sldr) updateSliderFill(sldr,val);
   drawAlbumChart(al);
@@ -663,7 +638,7 @@ function drawShareChart(al, canvasId) {
   };
   const ds=[{data:al.songs.map(s=>s.rating!==null?Number(s.rating):null),borderColor:'#5acea0',backgroundColor:(()=>{const g=ctx.createLinearGradient(0,0,0,110);g.addColorStop(0,'rgba(90,206,160,.35)');g.addColorStop(1,'rgba(90,206,160,0)');return g;})(),borderWidth:2,tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#5acea0',pointBorderColor:'#0a0c16',pointBorderWidth:1.5,spanGaps:true}];
   if(avg!==null) ds.push({data:al.songs.map(()=>avg),borderColor:'rgba(200,168,75,.55)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0});
-  CH['share']=new Chart(ctx,{type:'line',data:{labels:al.songs.map((_,i)=>String(i+1)),datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},tooltip:{...tipOpts,backgroundColor:'#151828',callbacks:{title:i=>{const s=al.songs[parseInt(i[0].label)-1];return s?s.name:`Track ${i[0].label}`;}}}},scales:shareScaleOpts}});
+  CH['share']=new Chart(ctx,{type:'line',data:{labels:al.songs.map((_,i)=>String(i+1)),datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},tooltip:{...tipOpts,backgroundColor:'#151828',callbacks:{title:i=>{const s=al.songs[parseInt(i[0].label)-1];return s?s.name:`Track ${i[0].label}`;}}}}  ,scales:shareScaleOpts}});
 }
 
 /* ─── Render ─── */
@@ -738,10 +713,10 @@ function viewHome() {
       <div class="stat-card" data-go="wrapped"><div class="stat-val">${totR}</div><div class="stat-lbl">Rated</div></div>
     </div>
     <div class="quick-nav">
-      <button class="btn btn-g btn-sm" data-go="decades">📅 Decades</button>
-      <button class="btn btn-g btn-sm" data-go="top10">🏆 Top 10</button>
-      <button class="btn btn-g btn-sm" data-go="wrapped">🎁 Wrapped</button>
-      <button class="btn btn-g btn-sm" data-go="compare">⚖️ Compare</button>
+      <button class="btn btn-g" data-go="decades">📅 Decades</button>
+      <button class="btn btn-g" data-go="top10">🏆 Top 10</button>
+      <button class="btn btn-g" data-go="wrapped">🎁 Wrapped</button>
+      <button class="btn btn-g" data-go="compare">⚖️ Compare</button>
     </div>
     <div class="search-wrap"><input id="home-q" class="search-inp" type="text" placeholder="Search artists, albums, songs…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${esc(ST.q)}"></div>
     <div id="home-results"></div>`;
@@ -790,6 +765,7 @@ function renderHomeResults() {
   }
 }
 
+/* viewArtist — NO pin button here, pin is only on the card grid */
 function viewArtist() {
   const ar=getAr(ST.aid); if(!ar){nav('home');return;}
   const a=arAvg(ar),sorted=chrono(ar);
@@ -797,7 +773,6 @@ function viewArtist() {
   <div class="act-row">
     ${a!==null?`<span class="mpill">Avg: <strong class="${rc(a)}">${a.toFixed(2)}</strong> / 10</span>`:''}
     <span class="mpill">${ar.albums.length} albums</span>
-    <button id="ar-pin-btn" class="artist-pin-btn${ar.pinned?' pinned':''}" data-pin-artist="${ar.id}" title="${ar.pinned?'Unpin artist':'Pin artist'}">📌</button>
     <button class="btn btn-d btn-sm" data-del-artist="${ar.id}">Delete</button>
   </div>`;
   if(sorted.length){
@@ -916,15 +891,12 @@ function viewWrapped() {
   document.getElementById('content').innerHTML=h;
 }
 
-/* ─── Compare (up to CMP_MAX albums) ─── */
+/* ─── Compare ─── */
 function viewCompare() {
   const all=[];
   D.artists.forEach(ar=>ar.albums.forEach(al=>all.push({al,ar})));
-  // clean up invalid ids
   ST.cmpIds=(ST.cmpIds||[]).filter(id=>all.some(x=>x.al.id===id));
   const selected=ST.cmpIds.map(id=>all.find(x=>x.al.id===id)).filter(Boolean);
-
-  // --- score cards ---
   const avgs=selected.map(({al})=>aAvg(al));
   const maxAvg=Math.max(...avgs.filter(v=>v!==null),-Infinity);
 
@@ -945,7 +917,6 @@ function viewCompare() {
     }).join('')}</div>`;
   }
 
-  // add picker if room
   let pickerHTML='';
   if(selected.length<CMP_MAX){
     const remaining=all.filter(({al})=>!ST.cmpIds.includes(al.id));
@@ -960,12 +931,10 @@ function viewCompare() {
     }
   }
 
-  // track-by-track chart (only if 2+)
   let chartHTML='',trackTableHTML='';
   if(selected.length>=2){
     chartHTML=`<div class="chart-box"><div class="chart-hdr"><div class="chart-ttl">Track by Track</div></div><div class="chart-wrap"><canvas id="cmp-chart"></canvas></div></div>`;
     const maxLen=Math.max(...selected.map(({al})=>al.songs.length));
-    const palette=['#c8a84b','#5acea0','#e07070','#7b9fe0'];
     trackTableHTML=`<div class="chart-box" style="padding:0 14px">`;
     for(let i=0;i<Math.min(maxLen,25);i++){
       const cells=selected.map(({al},ci)=>{
@@ -1081,43 +1050,79 @@ function showShareCard(aid, alid){
         <span class="share-footer-hint">Screenshot to share</span>
       </div>
     </div>
-    <div class="modal-acts" id="share-acts">
+    <div class="share-acts">
       <button class="btn btn-g" id="share-copy-btn">📋 Copy Image</button>
       <button class="btn btn-g" id="share-save-btn">⬇ Save Image</button>
-      <button class="btn btn-g" data-close-modal>Close</button>
+      <button class="btn btn-g" id="share-close-btn">Close</button>
     </div>`);
 
   setTimeout(()=>{
     drawShareChart(al,'share-chart');
     document.getElementById('share-save-btn')?.addEventListener('click',()=>exportShareImg('save',al.name));
     document.getElementById('share-copy-btn')?.addEventListener('click',()=>exportShareImg('copy',al.name));
+    // Explicit close handler — doesn't rely on delegation finding data-close-modal
+    document.getElementById('share-close-btn')?.addEventListener('click',()=>closeModal());
   },60);
 }
 
-async function exportShareImg(mode,name){
+async function exportShareImg(mode, name){
   const el=document.querySelector('.share-outer'); if(!el){toast('Nothing to export','var(--red)');return;}
-  const acts=document.getElementById('share-acts'); if(acts)acts.style.visibility='hidden';
+  const acts=document.querySelector('.share-acts'); if(acts)acts.style.visibility='hidden';
   try{
     const canvas=await html2canvas(el,{backgroundColor:'#0a0c16',scale:2.5,useCORS:true,logging:false});
     if(acts)acts.style.visibility='';
+
     if(mode==='save'){
       const a=document.createElement('a');
       a.download=(name||'rating').replace(/[^a-z0-9]/gi,'-')+'.png';
       a.href=canvas.toDataURL('image/png'); a.click();
       toast('Image saved ✓');
     } else {
+      // Copy: try modern Clipboard API first, fall back to opening in new tab
+      // (GitHub Pages / some browsers block clipboard write even on https — open-tab fallback always works)
       canvas.toBlob(async blob=>{
-        try{
-          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          toast('Copied to clipboard ✓');
-        }catch(e){
-          const w=window.open(); if(w){w.document.write('<img src="'+canvas.toDataURL()+'">'); toast('Opened — long-press to save');}
+        let copied=false;
+        // Only attempt clipboard API if available and page is focused
+        if(navigator.clipboard && typeof ClipboardItem !== 'undefined' && document.hasFocus()){
+          try{
+            await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+            copied=true;
+            toast('Copied to clipboard ✓');
+          }catch(e){
+            // Permissions denied or browser restriction — fall through
+          }
+        }
+        if(!copied){
+          // Universal fallback: open image in new tab so user can long-press/right-click save
+          const url=URL.createObjectURL(blob);
+          const w=window.open(url,'_blank');
+          if(w){
+            toast('Opened in new tab — save from there');
+            // Revoke after a delay so the image stays accessible
+            setTimeout(()=>URL.revokeObjectURL(url),60000);
+          }else{
+            // Pop-up blocked: offer download instead
+            const a=document.createElement('a');
+            a.href=canvas.toDataURL('image/png');
+            a.download=(name||'rating').replace(/[^a-z0-9]/gi,'-')+'.png';
+            a.click();
+            toast('Saved as download (pop-ups blocked)');
+          }
         }
       },'image/png');
     }
   }catch(e){
     if(acts)acts.style.visibility='';
-    toast('Export failed — try screenshot','var(--red)');
+    // Final fallback — just trigger a download
+    try{
+      const canvas2=await html2canvas(el,{backgroundColor:'#0a0c16',scale:2,useCORS:true,logging:false});
+      const a=document.createElement('a');
+      a.download=(name||'rating').replace(/[^a-z0-9]/gi,'-')+'.png';
+      a.href=canvas2.toDataURL('image/png'); a.click();
+      toast('Saved as download');
+    }catch(e2){
+      toast('Export failed — try screenshot','var(--red)');
+    }
     console.error(e);
   }
 }
@@ -1141,11 +1146,12 @@ function modalAddArtist(){
       <input class="modal-inp" id="m-aname" type="text" placeholder="e.g. NF, Kendrick Lamar…" autocomplete="off">
       ${sp?'<div id="sp-ar-res"></div>':''}
     </div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-ar-ok">Add Artist</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-ar-cancel">Cancel</button><button class="btn btn-p" id="m-ar-ok">Add Artist</button></div>`);
   const inp=document.getElementById('m-aname');
   if(sp) inp.addEventListener('input',debounce(spArtistSearch,400));
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter')submitAddArtist(); });
   document.getElementById('m-ar-ok').onclick=submitAddArtist;
+  document.getElementById('m-ar-cancel').onclick=closeModal;
 }
 function submitAddArtist(){ const n=document.getElementById('m-aname')?.value.trim(); if(!n)return; closeModal(); addArtist(n); }
 
@@ -1155,16 +1161,18 @@ function modalAddAlbum(aid){
     ${sp?`<div class="modal-field"><button class="btn btn-p" style="width:100%;justify-content:center" id="m-sp-import">🎵 Import from Spotify</button><div class="modal-hint" style="text-align:center;margin-top:7px">— or add manually —</div></div>`:''}
     <div class="modal-field"><label class="modal-lbl">Album Name</label><input class="modal-inp" id="m-alname" type="text" placeholder="e.g. DAMN., Mansion…" autocomplete="off"></div>
     <div class="modal-field"><label class="modal-lbl">Release Date</label><input class="modal-inp" id="m-aldate" type="date"><div class="modal-hint">Sorts albums chronologically</div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-al-ok">Add Album</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-al-cancel">Cancel</button><button class="btn btn-p" id="m-al-ok">Add Album</button></div>`);
   if(sp) document.getElementById('m-sp-import').onclick=()=>{ closeModal(); modalSpotifyAlbum(aid); };
   document.getElementById('m-al-ok').onclick=()=>{ const n=document.getElementById('m-alname')?.value.trim(),d=document.getElementById('m-aldate')?.value; if(!n)return; closeModal(); addAlbum(aid,n,d); };
+  document.getElementById('m-al-cancel').onclick=closeModal;
 }
 
 function modalAddSongs(aid,alid){
   openModal(`<div class="modal-title">Add Songs</div>
     <div class="modal-field"><label class="modal-lbl">Track Names</label><textarea class="modal-inp" id="m-songs" placeholder="One per line:&#10;Mansion&#10;Got You On My Mind&#10;Paralyzed"></textarea><div class="modal-hint">Paste a full tracklist — one per line</div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-songs-ok">Add Tracks</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-songs-cancel">Cancel</button><button class="btn btn-p" id="m-songs-ok">Add Tracks</button></div>`);
   document.getElementById('m-songs-ok').onclick=()=>{ const raw=document.getElementById('m-songs')?.value||''; const names=raw.split('\n').map(l=>l.trim()).filter(Boolean); if(!names.length)return; closeModal(); addSongs(aid,alid,names); };
+  document.getElementById('m-songs-cancel').onclick=closeModal;
 }
 
 function modalSettings(){
@@ -1181,20 +1189,23 @@ function modalSettings(){
     <div class="set-row"><div><div class="set-title">${tot.ar} artists · ${tot.al} albums · ${tot.s} songs</div><div class="set-sub">${kb} KB stored locally</div></div></div></div>
     <div class="set-sec"><div class="set-sec-lbl">Danger Zone</div>
     <div class="set-row"><div><div class="set-title">Clear Library</div><div class="set-sub">Delete all data permanently</div></div><div><button class="btn btn-d btn-sm" id="m-clear">Clear</button></div></div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Close</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-settings-close">Close</button></div>`);
   document.getElementById('m-sp-disc')?.addEventListener('click',spDisconnect);
   document.getElementById('m-sp-conn')?.addEventListener('click',spLogin);
   document.getElementById('m-export').onclick=exportData;
   document.getElementById('m-import').onclick=importFile;
   document.getElementById('m-paste').onclick=()=>{ closeModal(); modalPasteJSON(); };
   document.getElementById('m-clear').onclick=clearAll;
+  // Explicit close — no reliance on data-close-modal delegation
+  document.getElementById('m-settings-close').onclick=closeModal;
 }
 
 function modalPasteJSON(){
   openModal(`<div class="modal-title">Paste Backup JSON</div>
     <div class="modal-field"><label class="modal-lbl">Paste your .json backup here</label><textarea class="modal-inp" id="paste-json" style="height:150px;font-family:var(--f3);font-size:11px" placeholder='{"artists":[]}'></textarea><div class="modal-hint">Open backup in Notes app → Select All → Copy → paste here</div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-paste-ok">Restore</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-pastejson-cancel">Cancel</button><button class="btn btn-p" id="m-paste-ok">Restore</button></div>`);
   document.getElementById('m-paste-ok').onclick=()=>{ const raw=document.getElementById('paste-json')?.value.trim(); if(!raw){toast('Nothing pasted','var(--red)');return;} try{importJSON(raw);closeModal();}catch(e){toast('Invalid JSON','var(--red)');} };
+  document.getElementById('m-pastejson-cancel').onclick=closeModal;
 }
 
 /* ─── Export / Import ─── */
@@ -1286,7 +1297,8 @@ async function spArtistSearch(){
 async function modalSpotifyAlbum(aid){
   openModal(`<div class="modal-title">Import from Spotify</div>
     <div class="modal-field"><label class="modal-lbl">Search Album</label><input class="modal-inp" id="sp-al-q" type="text" placeholder="Album name…" autocomplete="off"><div id="sp-al-res"></div></div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-spalbum-cancel">Cancel</button></div>`);
+  document.getElementById('m-spalbum-cancel').onclick=closeModal;
   const inp=document.getElementById('sp-al-q');
   inp.addEventListener('input',debounce(async()=>{
     const q=inp.value.trim(); if(!q)return;
@@ -1322,7 +1334,8 @@ async function importAllSpotifyAlbums(aid){
   openModal(`<div class="modal-title">Import All Albums</div>
     <p style="font-size:13px;color:var(--dim);margin-bottom:14px">Found ${items.length} albums for <strong>${esc(ar.name)}</strong>. This will import all tracks without ratings.</p>
     <div style="max-height:200px;overflow-y:auto;margin-bottom:14px">${items.map(al=>`<div style="padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--dim)">${esc(al.name)} <span style="color:var(--fnt)">(${al.release_date?.slice(0,4)||'?'})</span></div>`).join('')}</div>
-    <div class="modal-acts"><button class="btn btn-g" data-close-modal>Cancel</button><button class="btn btn-p" id="m-import-all">Import All</button></div>`);
+    <div class="modal-acts"><button class="btn btn-g" id="m-importall-cancel">Cancel</button><button class="btn btn-p" id="m-import-all">Import All</button></div>`);
+  document.getElementById('m-importall-cancel').onclick=closeModal;
   document.getElementById('m-import-all').onclick=async()=>{
     closeModal(); toast('Importing…');
     for(const al of items){
@@ -1339,7 +1352,6 @@ async function importAllSpotifyAlbums(aid){
 
 /* ─── Global event delegation ─── */
 document.addEventListener('click', e => {
-  // ID-based targets
   const byId = e.target.closest('#logo,#btn-settings,#np-btn,#tb-add-ar,#tb-add-al,#tb-all-al,#tb-add-songs,#tb-playlist,#btn-quick-add,.bci[data-go]');
   if (byId) {
     const id = byId.id;
@@ -1364,8 +1376,7 @@ document.addEventListener('click', e => {
     }
   }
 
-  // data-attribute delegation
-  const t = e.target.closest('[data-go],[data-del-artist],[data-del-album],[data-del-song],[data-share],[data-sort],[data-close-modal],[data-pin-artist],[data-lock],[data-lock-album],[data-sp-artist],[data-sp-album-id],[data-cmp-remove]');
+  const t = e.target.closest('[data-go],[data-del-artist],[data-del-album],[data-del-song],[data-share],[data-sort],[data-pin-artist],[data-lock],[data-lock-album],[data-sp-artist],[data-sp-album-id],[data-cmp-remove]');
   if (!t) return;
 
   if (t.dataset.go) {
@@ -1381,7 +1392,6 @@ document.addEventListener('click', e => {
   if (t.dataset.delSong) { const [a,al,s]=t.dataset.delSong.split('|'); delSong(a,al,s); return; }
   if (t.dataset.share) { const [a,al]=t.dataset.share.split('|'); showShareCard(a,al); return; }
   if (t.dataset.sort) { ST.sort=t.dataset.sort; renderHomeResults(); return; }
-  if (t.dataset.closeModal) { closeModal(); return; }
   if (t.dataset.pinArtist) { toggleArtistPin(t.dataset.pinArtist); e.stopPropagation(); return; }
   if (t.dataset.lock) { const [a,al,s]=t.dataset.lock.split('|'); toggleLock(a,al,s); return; }
   if (t.dataset.lockAlbum) { const [a,al]=t.dataset.lockAlbum.split('|'); toggleAlbumLock(a,al); return; }
